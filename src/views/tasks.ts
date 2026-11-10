@@ -69,6 +69,7 @@ export function rowHtml(t: Task, opts: { showList?: boolean; drop?: boolean; q?:
   }
   return `<div class="row ${t.done ? 'done' : ''} ${ui.sel === t.id ? 'sel' : ''}" data-id="${t.id}" ${opts.drop ? 'data-drop="row"' : ''}>
     <button class="cb ${p} ${t.done ? 'on' : ''}" data-cb aria-label="Complete" ${ro ? 'disabled' : ''}>${I.check}</button>
+    <span class="pm ${p}" aria-hidden="true"></span>
     <div class="title">${title}</div>
     <div class="meta">${items}${note}${rep}${bell}${(t.tags || []).slice(0, 2).map(g => `<span class="tag">${esc(g)}</span>`).join('')}${showList}${t.due ? `<span class="due ${dueCls(t)}">${esc(dueText(t))}${pinnedTz(t) ? ' ' + I.globe : ''}</span>` : ''}${who}</div>
   </div>`;
