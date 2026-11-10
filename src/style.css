@@ -274,77 +274,95 @@ svg{display:block}
 .yd-b:hover{border-color:rgb(var(--c));color:rgba(var(--c),.5)}
 .yd-b.on{border:0;background:rgb(var(--c));color:#fff}
 
-/* ===== calendar ===== */
+/* ===== calendar (Gate A): hour lines are structure, today is a neutral 3% tint plus an orchid date pill ===== */
 .cal{display:flex;flex-direction:column;height:100%}
-.cal-grid{flex:1;display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;border-top:1px solid var(--line);border-left:1px solid var(--line);min-height:520px}
-.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);font-size:12px;color:var(--t3);padding:0 0 6px}
+.cal-grid{flex:1;display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;border-top:1px solid var(--line-c);border-left:1px solid var(--line-c);min-height:520px}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);font-size:13px;color:var(--text-2);padding:0 0 6px}
 .cal-dow div{padding-left:8px}
-.cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px;min-width:0;overflow:hidden;cursor:default}
-.cell:hover{background:rgba(var(--hover),.02)}
-.cell .d{font-size:12px;color:var(--t2);width:22px;height:22px;display:grid;place-items:center;border-radius:50%;margin-bottom:2px}
-.cell.other .d{color:var(--t4)}
-.cell.today .d{background:rgb(var(--primary));color:var(--on-primary)}
-.ev{font-size:12px;line-height:20px;height:20px;padding:0 6px;border-radius:4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;background:rgba(var(--c),.15);color:rgb(var(--c))}
-:root[data-mode="dark"] .ev{background:rgba(var(--c),.25)}
-.ev.done{opacity:.45;text-decoration:line-through}
-.ev.ghost{background:transparent;box-shadow:inset 0 0 0 1px rgba(var(--c),.45);opacity:.75}
-.more{font-size:11px;color:var(--t3);padding-left:6px}
-.seg{display:flex;background:rgba(var(--grey),.05);border-radius:6px;padding:2px}
-.seg button{padding:3px 10px;border-radius:5px;font-size:12px;color:var(--t2)}
-.seg button.on{background:rgb(var(--bg));color:var(--t1);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.cell{border-right:1px solid var(--line-c);border-bottom:1px solid var(--line-c);padding:4px;min-width:0;overflow:hidden;cursor:default}
+.cell:hover{background:color-mix(in oklab,var(--text) 2%,transparent)}
+.cell.today{background:color-mix(in oklab,var(--text) 3%,transparent)}
+.cell .d{font-size:13px;color:var(--text-2);min-width:24px;height:24px;padding:0 6px;display:grid;place-items:center;border-radius:var(--radius-pill);margin-bottom:2px}
+.cell.other .d{color:var(--text-3)}
+.cell.other{opacity:.7}
+.cell.today .d{background:var(--accent);color:var(--on-accent)}
+/* Events: a palette hue at 20% over the ground, with an inset 3px bar on the left. --ec is any CSS colour. */
+.ev{font-size:12.5px;line-height:20px;height:20px;padding:0 6px 0 9px;border-radius:var(--radius-sm);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;color:var(--text);background:color-mix(in oklab,var(--ec,var(--text-3)) 20%,var(--ground));box-shadow:inset 3px 0 0 var(--ec,var(--text-3))}
+.ev.done{opacity:.5;text-decoration:line-through}
+.ev.ghost{background:transparent;box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--ec,var(--text-3)) 55%,transparent);opacity:.75}
+.more{font-size:12px;color:var(--text-3);padding-left:6px}
+.seg{display:flex;border:1px solid var(--line-c);border-radius:var(--radius-sm);padding:2px;gap:2px}
+.seg button{padding:3px 10px;border-radius:4px;font-size:13px;color:var(--text-2);transition:background var(--dur-1) var(--ease-out),color var(--dur-1) var(--ease-out)}
+.seg button.on{background:var(--raised);color:var(--text)}
 
 .cell .d{border:0;background:none;cursor:pointer;font:inherit}
-.cell .d:hover{background:rgba(var(--hover),.08)}
-.cell.today .d:hover{background:rgb(var(--primary))}
+.cell .d:hover{background:color-mix(in oklab,var(--text) 8%,transparent)}
+.cell.today .d:hover{background:var(--accent)}
 .more{cursor:pointer}
-.more:hover{color:var(--t2)}
+.more:hover{color:var(--text-2)}
 
 /* week and day: hour grid */
-.tg{flex:1;min-height:0;display:flex;flex-direction:column;--gut:52px}
+.tg{flex:1;min-height:0;display:flex;flex-direction:column;--gut:56px}
 .tg-head,.tg-all{display:grid;grid-template-columns:var(--gut) repeat(var(--days),minmax(0,1fr))}
-.tg-head{padding-bottom:4px}
-.tg-dh{border:0;background:none;font:inherit;color:var(--t3);display:flex;flex-direction:column;align-items:center;gap:2px;padding:2px 0;cursor:pointer;border-radius:6px;min-width:0}
-.tg-dh span{font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-.tg-dh b{font-size:18px;font-weight:600;color:var(--t2);width:30px;height:30px;display:grid;place-items:center;border-radius:50%}
-.tg-dh:hover{background:rgba(var(--hover),.04)}
-.tg-dh.today span{color:rgb(var(--primary))}
-.tg-dh.today b{background:rgb(var(--primary));color:var(--on-primary)}
-.tg-all{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.tg-gut{font-size:10px;color:var(--t3);text-align:right;padding:6px 8px 0 0}
-.tg-ad{border-left:1px solid var(--line);padding:3px 2px;min-height:28px;min-width:0;max-height:96px;overflow-y:auto}
-.tg-ad.drop-over{background:rgba(var(--primary),.08)}
+.tg-dh{border:0;background:none;font:inherit;color:var(--text-2);display:flex;align-items:baseline;gap:6px;padding:10px 8px;cursor:pointer;min-width:0;border-left:1px solid var(--line-c);transition:background var(--dur-1) var(--ease-out)}
+.tg-dh span{font-size:13px}
+.tg-dh b{font-size:13px;font-weight:500;color:var(--text);padding:1px 7px;border-radius:var(--radius-pill)}
+.tg-dh:hover{background:color-mix(in oklab,var(--text) 4%,transparent)}
+.tg-dh.today b{background:var(--accent);color:var(--on-accent)}
+.tg-all{border-top:1px solid var(--line-c);border-bottom:1px solid var(--line-c)}
+.tg-gut{font-size:11.5px;color:var(--text-3);text-align:right;padding:8px 8px 0 0}
+.tg-ad{border-left:1px solid var(--line-c);padding:4px;display:grid;align-content:start;gap:3px;min-height:34px;min-width:0;max-height:96px;overflow-y:auto}
+.tg-ad.drop-over{background:color-mix(in oklab,var(--accent) 9%,transparent)}
 .tg-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
 .tg-body{display:grid;grid-template-columns:var(--gut) repeat(var(--days),minmax(0,1fr));height:calc(24 * var(--hour));position:relative}
-.tg-hours div{height:var(--hour);font-size:10px;color:var(--t3);text-align:right;padding-right:8px;transform:translateY(-6px)}
-.tg-col{position:relative;border-left:1px solid var(--line);min-width:0;
-  background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px var(--hour))}
-.tg-col.today{background-color:rgba(var(--primary),.025)}
-.tg-col.drop-over{background-color:rgba(var(--primary),.06)}
-.blk{position:absolute;box-sizing:border-box;border-radius:5px;padding:2px 6px;overflow:hidden;cursor:pointer;user-select:none;-webkit-user-select:none;
-  background:rgba(var(--c),.16);border-left:3px solid rgb(var(--c));color:var(--t1);font-size:12px;line-height:16px;z-index:1}
-:root[data-mode="dark"] .blk{background:rgba(var(--c),.28)}
-.blk:hover{z-index:2;box-shadow:0 1px 4px rgba(0,0,0,.15)}
-.blk .bt{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.blk .bs{font-size:11px;color:var(--t2);white-space:nowrap}
+.tg-hours div{height:var(--hour);font-size:11.5px;color:var(--text-3);text-align:right;padding-right:8px;transform:translateY(-8px)}
+.tg-col{position:relative;border-left:1px solid var(--line-c);min-width:0;
+  background-image:linear-gradient(var(--line-c) 1px,transparent 1px),linear-gradient(color-mix(in oklab,var(--line-c) 45%,transparent) 1px,transparent 1px);
+  background-size:100% var(--hour),100% calc(var(--hour) / 2)}
+.tg-col.today{background-color:color-mix(in oklab,var(--text) 3%,transparent)}
+.tg-col.drop-over{background-color:color-mix(in oklab,var(--accent) 9%,transparent)}
+.blk{position:absolute;box-sizing:border-box;border-radius:var(--radius-sm);padding:4px 8px;overflow:hidden;cursor:pointer;user-select:none;-webkit-user-select:none;
+  background:color-mix(in oklab,var(--ec,var(--text-3)) 20%,var(--ground));box-shadow:inset 3px 0 0 var(--ec,var(--text-3));color:var(--text);font-size:12.5px;line-height:1.3;z-index:1;transition:box-shadow var(--dur-1) var(--ease-out)}
+.blk:hover{z-index:2;background:color-mix(in oklab,var(--ec,var(--text-3)) 26%,var(--ground))}
+.blk .bt{font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.blk .bs{font-size:11px;color:var(--text-2);white-space:nowrap}
 .blk.short{display:flex;gap:6px;align-items:baseline;padding-top:0;padding-bottom:0}
 .blk.short .bt{flex:0 1 auto;min-width:0}
 .blk.short .bs{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .blk.done{opacity:.5}.blk.done .bt{text-decoration:line-through}
-.blk.ghost{background:transparent;border:1px dashed rgba(var(--c),.6);border-left-width:3px;opacity:.75}
-.blk.dragging{z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.2);opacity:.9}
-.blk.preview{z-index:5;border-left-color:rgb(var(--primary));background:rgba(var(--primary),.2);font-size:11px;color:var(--t2);pointer-events:none}
+.blk.ghost{background:transparent;box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--ec,var(--text-3)) 55%,transparent),inset 3px 0 0 var(--ec,var(--text-3));opacity:.75}
+.blk.dragging{z-index:5;box-shadow:inset 3px 0 0 var(--ec,var(--text-3)),var(--shadow-pop);opacity:.9}
+.blk.preview{z-index:5;background:color-mix(in oklab,var(--accent) 9%,var(--ground));box-shadow:inset 0 0 0 1px var(--accent-line);font-size:11px;color:var(--text-2);pointer-events:none}
 .blk .rz{position:absolute;left:0;right:0;bottom:0;height:7px;cursor:ns-resize}
 .tg-dragging,.tg-dragging *{cursor:grabbing!important}
-.tg-col .now{position:absolute;left:-1px;right:0;height:2px;background:rgb(var(--danger));z-index:3;pointer-events:none}
-.tg-col .now::before{content:"";position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:rgb(var(--danger))}
-.tg-ad .ev{margin-bottom:2px}
+.tg-col .now{position:absolute;left:-1px;right:0;height:2px;background:var(--danger-c);z-index:3;pointer-events:none}
+.tg-col .now::before{content:"";position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--danger-c)}
+/* All-day task chips: a surface card with a checkbox and a priority dot (Gate A) */
+.ev.tchip{display:flex;align-items:center;gap:6px;padding:0 6px;height:auto;min-height:22px;line-height:1.4;margin:0;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-c)}
+.ev.tchip .cb{width:12px;height:12px;border-radius:3px;border-width:1.5px;pointer-events:none}
+.ev.tchip .cb svg{width:9px;height:9px}
+.ev.tchip .cb.on{background:var(--text-3);border-color:var(--text-3)}
+.ev.tchip .cb.on svg{color:var(--ground)}
+.ev.tchip .pm{width:8px;height:8px;border-width:1.5px}
+.ev.tchip.done .pm.p5,.ev.tchip.done .pm.p3,.ev.tchip.done .pm.p1{border-color:var(--text-3)}
+.ev.tchip.done .pm.p5{background:var(--text-3)}
+.ev.tchip.done .pm.p3{background:linear-gradient(90deg,var(--text-3) 50%,transparent 50%)}
+.ev.tchip.done{text-decoration:none}
+.ev.tchip.done .tt{text-decoration:line-through}
+.ev.tchip .tt{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.ev.tchip.ghost{background:transparent;box-shadow:inset 0 0 0 1px var(--line-c)}
 .fld .hint{font-size:12px;color:var(--t3)}
 @media (max-width:760px){
   .cal-seg span{display:none}
   .cal-seg button{padding:3px 9px}
-  .tg{--gut:40px}
-  .tg-dh b{font-size:15px;width:26px;height:26px}
-  .blk{padding:1px 3px;font-size:11px}
+  .tg{--gut:44px}
+  .tg-hours div{white-space:nowrap;font-size:10.5px;padding-right:6px}
+  .tg-gut{font-size:10.5px;padding-right:4px;white-space:nowrap}
+  .ev.tchip{padding:0 4px;gap:3px}
+  .ev.tchip .cb{display:none}
+  .tg-dh{flex-direction:column;align-items:center;gap:2px;padding:6px 0}
+  .tg-dh span{font-size:12px}
+  .blk{padding:1px 3px 1px 6px;font-size:11px}
   .blk .bs{display:none}
 }
 
@@ -515,7 +533,7 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
 .touch-ghost{opacity:.92;box-shadow:0 8px 24px rgba(0,0,0,.25);border-radius:8px;background:rgb(var(--bg))}
 
 /* ===== Martian Mono for real data only (T3, T12): times, dates, counts, durations ===== */
-:is(.sec-h .n,.nav-item .cnt,.pop .mi .kbd,.cell .d,.tg-dh b,.tg-hours,.tg-gut,.blk .bs,.ring .time,.stat .v,.rec > span:last-child,.wd button.part,.wd button.on,.more){font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+:is(.sec-h .n,.nav-item .cnt,.pop .mi .kbd,.cell .d,.tg-dh b,.tg-hours,.blk .bs,.ring .time,.stat .v,.rec > span:last-child,.wd button.part,.wd button.on,.more){font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 :is(.blk .bs,.tg-hours,.nav-item .cnt,.sec-h .n){font-size:calc(var(--text-size) * var(--mono-scale) - 1.5px);letter-spacing:-.01em}
 .ring .time{font-weight:400;letter-spacing:-.02em}
 .stat .v{font-weight:500}
@@ -529,11 +547,8 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
 .theme-mode{margin:6px 4px 4px}
 .theme-mode button{flex:1}
 
-/* Google events on the calendar: read-only, in their Google calendar's colour */
-/* (:root raises these above the dark-mode .ev/.blk rules, which expect --c.) */
-:root .ev.gx{background:color-mix(in srgb,var(--gx) 18%,transparent);color:var(--t1);box-shadow:inset 3px 0 0 var(--gx);padding-left:7px}
-:root .tg-col .blk.gx{background-color:color-mix(in srgb,var(--gx) 20%,rgb(var(--bg)));border-left:3px solid var(--gx);cursor:pointer;
-  background-image:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--gx) 10%,transparent) 6px 7px)}
+/* Google events: read-only, in their calendar's palette hue (set as --ec by calendar.ts); same look as tasks plus a faint hatch on blocks */
+.blk.gx{cursor:pointer;background-image:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in oklab,var(--ec) 10%,transparent) 6px 7px)}
 .blk.gx .bt{font-weight:400}
 .gx-info{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);margin:0 8px 6px}
 .gx-info .dot{width:10px;height:10px;border-radius:3px}

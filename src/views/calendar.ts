@@ -25,7 +25,8 @@ import { popover } from '../ui/popover';
 const HOUR_PX = 48;
 const PX_PER_MIN = HOUR_PX / 60;
 
-const color = (t: Task) => t.priority === 5 ? 'var(--p-high)' : (S.lists[t.listId]?.color || COLORS[7]) === COLORS[7] ? 'var(--primary)' : listColor(t.listId);
+/** A task's event colour as a full CSS colour: high priority red, the default list orchid, else its list hue. */
+const color = (t: Task) => t.priority === 5 ? 'var(--prio-high)' : (S.lists[t.listId]?.color || COLORS[7]) === COLORS[7] ? 'var(--accent)' : `rgb(${listColor(t.listId)})`;
 const anchor = () => ui.calDate || todayD();
 const yearSuffix = (d: Date) => (d.getFullYear() === todayD().getFullYear() ? '' : `, ${d.getFullYear()}`);
 
@@ -81,7 +82,14 @@ function byDay(items: CalItem[]) {
 }
 
 const evHtml = ({ t, time, ghost }: CalItem) =>
-  `<div class="ev ${t.done ? 'done' : ''} ${ghost ? 'ghost' : ''}" data-id="${t.id}" ${ghost ? 'title="Upcoming repeat"' : ''} style="--c:${color(t)}">${time ? fmtTime(time).replace(' ', '') + ' ' : ''}${esc(t.title || 'Untitled')}</div>`;
+  `<div class="ev ${t.done ? 'done' : ''} ${ghost ? 'ghost' : ''}" data-id="${t.id}" ${ghost ? 'title="Upcoming repeat"' : ''} style="--ec:${color(t)}">${time ? fmtTime(time).replace(' ', '') + ' ' : ''}${esc(t.title || 'Untitled')}</div>`;
+
+/** All-day task chip (Gate A): a small card with a checkbox and a priority dot. */
+const chipHtml = ({ t, ghost }: CalItem) => {
+  const p = t.priority ? 'p' + t.priority : '';
+  return `<div class="ev tchip ${t.done ? 'done' : ''} ${ghost ? 'ghost' : ''}" data-id="${t.id}" ${ghost ? 'title="Upcoming repeat"' : ''}>
+    <span class="cb ${t.done ? 'on' : ''}" aria-hidden="true">${I.check}</span>${p ? `<span class="pm ${p}" aria-hidden="true"></span>` : ''}<span class="tt">${esc(t.title || 'Untitled')}</span></div>`;
+};
 
 // ---------- Google events (read-only) ----------
 
@@ -110,9 +118,9 @@ export function safeColor(c: string): string {
 }
 const extRef = (ev: ExtEvent) => { const k = ev.cal + '|' + ev.id; extIdx.set(k, ev); return esc(k); };
 const extChip = (x: ExtPlaced) =>
-  `<div class="ev gx" data-gx="${extRef(x.ev)}" style="--gx:${safeColor(x.ev.color)}" title="${esc(x.ev.calName)}">${!x.allDay ? fmtTime(fromMin(x.start)).replace(' ', '') + ' ' : ''}${esc(x.ev.title)}</div>`;
+  `<div class="ev gx" data-gx="${extRef(x.ev)}" style="--ec:${safeColor(x.ev.color)}" title="${esc(x.ev.calName)}">${!x.allDay ? fmtTime(fromMin(x.start)).replace(' ', '') + ' ' : ''}${esc(x.ev.title)}</div>`;
 function extBlock(ev: ExtEvent, p: { col: number; cols: number }, start: number, end: number) {
-  return `<div class="blk gx ${end - start < 45 ? 'short' : ''}" data-gx="${extRef(ev)}" style="--gx:${safeColor(ev.color)};top:${start * PX_PER_MIN}px;height:${(end - start) * PX_PER_MIN - 2}px;left:calc(${p.col} * 100% / ${p.cols});width:calc(100% / ${p.cols} - 3px)">
+  return `<div class="blk gx ${end - start < 45 ? 'short' : ''}" data-gx="${extRef(ev)}" style="--ec:${safeColor(ev.color)};top:${start * PX_PER_MIN}px;height:${(end - start) * PX_PER_MIN - 2}px;left:calc(${p.col} * 100% / ${p.cols});width:calc(100% / ${p.cols} - 3px)">
     <div class="bt">${esc(ev.title)}</div><div class="bs">${fmtTime(fromMin(start))} – ${fmtTime(fromMin(end % 1440))}</div></div>`;
 }
 
@@ -179,7 +187,7 @@ function gridHtml(days: Date[]) {
   const keys = days.map(ymd), today = TODAY();
   const map = byDay(itemsInRange(live(), keys[0]!, keys[keys.length - 1]!));
   const ext = extByDay(extInRange(googleEvents(), keys[0]!, keys[keys.length - 1]!));
-  const allDay = (k: string) => (map[k] || []).filter(i => !i.time).sort((x, y) => +x.ghost - +y.ghost).map(evHtml).join('') + (ext[k] || []).filter(x => x.allDay).map(extChip).join('');
+  const allDay = (k: string) => (map[k] || []).filter(i => !i.time).sort((x, y) => +x.ghost - +y.ghost).map(chipHtml).join('') + (ext[k] || []).filter(x => x.allDay).map(extChip).join('');
   const col = (k: string) => {
     const timed = (map[k] || []).filter(i => i.time);
     const blocks = timed.map((it, i) => ({ key: String(i), it, start: toMin(it.time!), end: Math.min(1440, toMin(it.time!) + Math.max(SNAP, it.t.dur || DEFAULT_DUR)) }));
@@ -189,7 +197,7 @@ function gridHtml(days: Date[]) {
     return `<div class="tg-col ${k === today ? 'today' : ''}" data-drop="slot" data-v="${k}">${blocks.map(b => {
       const p = placed.get(b.key)!, t = b.it.t, short = b.end - b.start < 45;
       const rw = !b.it.ghost && canWrite(t.listId);
-      return `<div class="blk ${t.done ? 'done' : ''} ${b.it.ghost ? 'ghost' : ''} ${short ? 'short' : ''}" data-id="${t.id}" ${rw ? 'data-rw' : ''} style="--c:${color(t)};top:${b.start * PX_PER_MIN}px;height:${(b.end - b.start) * PX_PER_MIN - 2}px;left:calc(${p.col} * 100% / ${p.cols});width:calc(100% / ${p.cols} - 3px)">
+      return `<div class="blk ${t.done ? 'done' : ''} ${b.it.ghost ? 'ghost' : ''} ${short ? 'short' : ''}" data-id="${t.id}" ${rw ? 'data-rw' : ''} style="--ec:${color(t)};top:${b.start * PX_PER_MIN}px;height:${(b.end - b.start) * PX_PER_MIN - 2}px;left:calc(${p.col} * 100% / ${p.cols});width:calc(100% / ${p.cols} - 3px)">
         <div class="bt">${esc(t.title || 'Untitled')}</div><div class="bs">${fmtTime(b.it.time!)} – ${fmtTime(fromMin(b.end % 1440))}</div>${rw ? '<i class="rz" aria-hidden="true"></i>' : ''}</div>`;
     }).join('')}${gx.map(b => extBlock(b.x.ev, placed.get(b.key)!, b.start, b.end)).join('')}${nowLine}</div>`;
   };
@@ -292,7 +300,7 @@ function activate(d: Drag) {
   if (d.mode === 'create') {
     d.el = document.createElement('div');
     d.el.className = 'blk preview';
-    d.el.style.cssText = `--c:var(--primary);left:0;width:calc(100% - 3px)`;
+    d.el.style.cssText = `--ec:var(--accent);left:0;width:calc(100% - 3px)`;
     d.col.appendChild(d.el);
     if (d.touch) d.dur = 60; // a long-press makes a one-hour block; drag to change
     paint(d, d.col, d.start, d.dur);
