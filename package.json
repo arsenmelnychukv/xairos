@@ -1,0 +1,42 @@
+{
+  "name": "xairos",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "author": "Arsenii Melnychuk",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "VITE_BACKEND=pocketbase vite --host 127.0.0.1 --port 5179",
+    "dev:local": "vite --host 127.0.0.1 --port 5179",
+    "pb": "node scripts/with-env.mjs server/.env -- bin/pocketbase serve --dir server/pb_data --hooksDir server/pb_hooks --migrationsDir server/pb_migrations --http 127.0.0.1:8090",
+    "pb:get": "scripts/get-pocketbase.sh",
+    "vapid": "node scripts/vapid.mjs server/.env",
+    "notifier": "npm run build:notifier && node --env-file-if-exists=server/.env dist-server/notifier.mjs",
+    "build": "npm run typecheck && npm run build:hooks && VITE_BACKEND=pocketbase vite build",
+    "build:hooks": "vite build -c vite.hooks.config.ts --logLevel warn",
+    "build:notifier": "vite build -c vite.notifier.config.ts",
+    "preview": "vite preview --host 127.0.0.1 --port 5180",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.sw.json",
+    "icons": "scripts/make-icons.sh",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "fake-indexeddb": "^6.2.7",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.1.0",
+    "workbox-build": "^7.4.1",
+    "workbox-core": "^7.4.1",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1",
+    "workbox-window": "^7.4.1"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/libre-caslon-display": "^5.3.0",
+    "pocketbase": "^0.28.2"
+  }
+}

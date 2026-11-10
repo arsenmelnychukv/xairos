@@ -1,0 +1,8 @@
+# Install: cp xairos-backup-pull.{service,timer} ~/.config/systemd/user/ &&
+#          systemctl --user enable --now xairos-backup-pull.timer
+[Unit]
+Description=Copy xairos backups from the server to this laptop
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/xairos-backup-pull

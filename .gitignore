@@ -1,0 +1,18 @@
+.DS_Store
+node_modules/
+dist/
+*.log
+.env
+.env.*
+pb_data/
+bin/
+dist-server/
+server/notifier_data/
+release/
+
+# Obsidian vault settings (local)
+.obsidian/
+
+# Local notes and agent config, never published
+dev-notes/
+.claude/

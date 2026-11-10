@@ -1,0 +1,10 @@
+[Unit]
+Description=Copy xairos backups to this laptop every few hours
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=4h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

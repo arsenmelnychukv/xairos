@@ -1,0 +1,57 @@
+# xairos behind Caddy. XAIROS_HOST and XAIROS_TLS come from /etc/xairos/caddy.env
+# (a systemd drop-in for caddy.service).
+# XAIROS_TLS=internal (the default): HTTPS from Caddy's own certificate authority, for a
+#   private network; trust its root on each device once (install.sh publishes it at
+#   http://XAIROS_HOST/xairos-ca.crt).
+# XAIROS_TLS=<email>: a public certificate from Let's Encrypt; the host needs a public
+#   DNS name and ports 80 and 443 reachable from the internet.
+{
+	# The CA lives in Caddy's data directory; it is not added to this container's trust store.
+	skip_install_trust
+}
+
+https://{$XAIROS_HOST} {
+	tls {$XAIROS_TLS:internal}
+	encode zstd gzip
+
+	# PocketBase: the xairos API and realtime (server-sent events must not be buffered).
+	handle /api/* {
+		reverse_proxy 127.0.0.1:8090 {
+			flush_interval -1
+		}
+	}
+	# The PocketBase admin UI stays private: reach it with an SSH tunnel to 127.0.0.1:8090/_/.
+	handle /_/* {
+		respond "Not available here. Use an SSH tunnel to 127.0.0.1:8090/_/." 404
+	}
+	# The app: hashed assets cache forever; the shell and service worker always revalidate.
+	handle {
+		root * /opt/xairos/current/dist
+		@immutable path /assets/*
+		header @immutable Cache-Control "public, max-age=31536000, immutable"
+		@fresh path / /index.html /sw.js /manifest.webmanifest /registerSW.js
+		header @fresh Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		-Server
+	}
+}
+
+# Plain HTTP: the CA certificate for new devices (internal mode only; with a public
+# certificate the file is absent); everything else goes to HTTPS.
+http://{$XAIROS_HOST} {
+	handle /xairos-ca.crt {
+		# Outside /var/lib/xairos, which only the xairos user may enter.
+		root * /opt/xairos/ca
+		header Content-Type "application/x-x509-ca-cert"
+		file_server
+	}
+	handle {
+		redir https://{host}{uri} permanent
+	}
+}

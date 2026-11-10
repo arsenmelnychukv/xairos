@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>xairos</title>
+<meta name="description" content="Tasks, calendar, focus and habits.">
+<meta name="theme-color" content="#ffffff">
+<script>
+  // Set the theme before first paint (src/ui/theme.ts keeps it current).
+  try {
+    var p = JSON.parse(localStorage.getItem('xairos.prefs') || localStorage.getItem('kai' + 'ros.prefs') || '{}'), t = p.theme || 'system', r = document.documentElement;
+    r.dataset.mode = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme:dark)').matches) ? 'dark' : 'light';
+    if (p.family === 'sails') r.dataset.family = 'sails';
+  } catch (e) { /* storage blocked: defaults */ }
+</script>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="xairos">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+</head>
+<body>
+<div class="app" id="app" hidden>
+  <nav class="rail" id="rail"></nav>
+  <aside class="side" id="side"></aside>
+  <div class="scrim" id="scrim"></div>
+  <main class="main" id="main"></main>
+  <section class="detail hidden" id="detail"></section>
+</div>
+<div class="auth" id="auth" hidden></div>
+<div class="rem-stack" id="rem-stack"></div>
+<div class="toast" id="toast"><span id="toast-msg"></span><button id="toast-undo">Undo</button></div>
+<input type="file" id="import-file" accept="application/json,.json,.csv,text/csv,.zip,application/zip" hidden>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

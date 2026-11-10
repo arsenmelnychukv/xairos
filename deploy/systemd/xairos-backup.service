@@ -1,0 +1,12 @@
+[Unit]
+Description=xairos backup (restic)
+After=xairos-pb.service
+
+[Service]
+Type=oneshot
+User=xairos
+Group=xairos
+EnvironmentFile=/etc/xairos/xairos.env
+ExecStart=/opt/xairos/current/deploy/backup.sh
+Nice=10
+IOSchedulingClass=idle

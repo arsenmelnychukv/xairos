@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightly xairos backup
+
+[Timer]
+OnCalendar=*-*-* 03:30
+RandomizedDelaySec=15min
+# Run after boot if the container was off at 03:30.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

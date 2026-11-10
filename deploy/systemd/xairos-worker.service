@@ -1,0 +1,19 @@
+[Unit]
+Description=xairos worker (reminder pushes, Google Calendar sync)
+After=xairos-pb.service
+Wants=xairos-pb.service
+
+[Service]
+User=xairos
+Group=xairos
+EnvironmentFile=/etc/xairos/xairos.env
+ExecStart=/usr/bin/node /opt/xairos/current/dist-server/notifier.mjs
+Restart=always
+RestartSec=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/xairos
+
+[Install]
+WantedBy=multi-user.target

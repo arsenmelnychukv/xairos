@@ -1,0 +1,26 @@
+[Unit]
+Description=xairos server (PocketBase)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=xairos
+Group=xairos
+EnvironmentFile=/etc/xairos/xairos.env
+ExecStart=/opt/xairos/current/bin/pocketbase serve --http 127.0.0.1:8090 \
+  --dir /var/lib/xairos/pb_data \
+  --hooksDir /opt/xairos/current/server/pb_hooks \
+  --migrationsDir /opt/xairos/current/server/pb_migrations \
+  --hooksWatch=false
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=4096
+# Hardening. If the service fails with status=226/NAMESPACE, the LXC container needs
+# nesting (Proxmox: Options → Features → nesting); or delete these four lines.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/xairos
+
+[Install]
+WantedBy=multi-user.target
