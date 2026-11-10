@@ -1,8 +1,8 @@
+// Brand fonts (OFL), bundled so they work offline. Browsers fetch only the subsets a page uses.
+import '@fontsource-variable/onest/wght.css';
+import '@fontsource-variable/martian-mono/wght.css';
+import './ui/tokens.css';
 import './style.css';
-// Quiet Sails fonts (OFL), bundled so they work offline. Browsers fetch them only when that theme uses them.
-import '@fontsource/libre-caslon-display/latin-400.css';
-import '@fontsource/ibm-plex-mono/latin-400.css';
-import '@fontsource/ibm-plex-mono/latin-500.css';
 import { $ } from './lib/util';
 import { flushLocal, loadLocal, saveSession, session } from './store';
 import { initApp, readHash } from './app';

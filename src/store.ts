@@ -42,8 +42,8 @@ export function clearDb() { S = null as unknown as ClientDb; }
 export interface Prefs {
   /** Light or dark: follow the system, or fixed. */
   theme: 'system' | 'light' | 'dark';
-  /** Theme family: Classic or Quiet Sails. */
-  family?: 'classic' | 'sails';
+  /** Retired theme family; kept so old saved prefs still parse. */
+  family?: string;
   kanban: boolean; closed: Record<string, boolean>; sideClosed: Record<string, boolean>;
   /** 1 = weeks start Monday, 0 = Sunday. */
   weekStart: number;
@@ -127,13 +127,16 @@ export const userLists = () => Object.values(S.lists).filter(l => !l.removed && 
 export const listById = (id: string): List | undefined => S.lists[id];
 export const listName = (id: string) => (id === inboxId() || S.lists[id]?.inbox) ? 'Inbox' : (S.lists[id]?.name || 'Inbox');
 /**
- * Quiet Sails shows the eight preset colours as muted versions (rye, brick,
- * ochre, moss, plum, teal, rose, grit). Stored colours never change.
+ * The eight preset colours are stored as picked; on screen each shows as its
+ * brand habit hue (palette.md: oklch 0.76 / 0.52 at the preset's hue; pink is
+ * rose-grey, grey is muted text). Stored colours never change.
  */
-const SAILS_COLORS = ['62,105,117', '178,58,44', '168,120,31', '78,107,74', '122,79,110', '140,90,43', '176,110,100', '140,133,122'];
+const HUE_DARK = ['109,182,255', '249,143,135', '215,170,66', '111,200,132', '176,162,254', '29,203,188', '198,160,162', '126,129,104'];
+const HUE_LIGHT = ['17,107,181', '171,65,62', '141,96,0', '10,126,58', '106,87,179', '0,129,115', '131,93,96', '94,99,76'];
 export const tc = (rgb: string): string => {
-  const i = prefs.family === 'sails' ? COLORS.indexOf(rgb) : -1;
-  return i < 0 ? rgb : SAILS_COLORS[i]!;
+  const i = COLORS.indexOf(rgb);
+  if (i < 0) return rgb;
+  return (document.documentElement.dataset.mode === 'dark' ? HUE_DARK : HUE_LIGHT)[i]!;
 };
 export const listColor = (id: string) => tc(S.lists[id]?.color || COLORS[7]!);
 export const isShared = (l: List | undefined) => !!l && (Object.keys(l.members || {}).length > 0 || l.ownerId !== me());

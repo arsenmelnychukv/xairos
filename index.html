@@ -5,20 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>xairos</title>
 <meta name="description" content="Tasks, calendar, focus and habits.">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0C1517">
 <script>
   // Set the theme before first paint (src/ui/theme.ts keeps it current).
   try {
     var p = JSON.parse(localStorage.getItem('xairos.prefs') || localStorage.getItem('kai' + 'ros.prefs') || '{}'), t = p.theme || 'system', r = document.documentElement;
     r.dataset.mode = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme:dark)').matches) ? 'dark' : 'light';
-    if (p.family === 'sails') r.dataset.family = 'sails';
   } catch (e) { /* storage blocked: defaults */ }
 </script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="xairos">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 </head>
 <body>

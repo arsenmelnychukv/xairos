@@ -91,7 +91,23 @@ function extByDay(list: ExtPlaced[]) {
   return m;
 }
 const extIdx = new Map<string, ExtEvent>();
-const safeColor = (c: string) => (/^#[0-9a-f]{3,8}$/i.test(c) ? c : '#7986cb');
+/** Habit hues from the palette; Google colours snap to the nearest one (palette.md, C19). */
+const HABIT_HUES = [25, 55, 85, 120, 150, 185, 215, 250, 290];
+/** A Google colour as a brand hue: grey-ish colours (Graphite) become muted text. */
+export function safeColor(c: string): string {
+  const m = /^#([0-9a-f]{6})$/i.exec(c);
+  if (!m) return 'var(--text-3)';
+  const n = parseInt(m[1]!, 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  if (d < 0.12) return 'var(--text-3)';
+  let h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  h = (h * 60 + 360) % 360;
+  // sRGB hue to the nearest palette hue (OKLCH hues sit a little higher for blues and violets)
+  const target = h + (h > 200 && h < 300 ? 25 : 0);
+  const dist = (x: number) => Math.min(Math.abs(x - target), 360 - Math.abs(x - target));
+  const hue = HABIT_HUES.reduce((a, x) => (dist(x) < dist(a) ? x : a));
+  return `oklch(var(--hab-l) var(--hab-c) ${hue})`;
+}
 const extRef = (ev: ExtEvent) => { const k = ev.cal + '|' + ev.id; extIdx.set(k, ev); return esc(k); };
 const extChip = (x: ExtPlaced) =>
   `<div class="ev gx" data-gx="${extRef(x.ev)}" style="--gx:${safeColor(x.ev.color)}" title="${esc(x.ev.calName)}">${!x.allDay ? fmtTime(fromMin(x.start)).replace(' ', '') + ' ' : ''}${esc(x.ev.title)}</div>`;

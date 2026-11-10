@@ -39,7 +39,7 @@ self.addEventListener('push', e => {
   try { p = e.data!.json(); } catch { return; }
   e.waitUntil(self.registration.showNotification(p.title, {
     body: p.body, tag: p.tag, data: { taskId: p.taskId, habitId: p.habitId, act: p.act } satisfies NoteData, timestamp: p.at,
-    icon: '/icons/icon-192.png', badge: '/icons/icon-192.png', actions: buttons(p),
+    icon: '/icons/icon-192.png', badge: '/icons/badge-96.png', actions: buttons(p),
   } as NotificationOptions));
 });
 

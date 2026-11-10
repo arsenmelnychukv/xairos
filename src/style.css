@@ -1,61 +1,13 @@
-/* ===== Design tokens =====
- * Four themes: Classic and Quiet Sails, each light and dark.
- * src/ui/theme.ts sets data-family="sails" and data-mode="light|dark" on
- * <html> (index.html sets them before first paint). Colours are "r,g,b" so
- * they can take an alpha: rgb(var(--primary)), rgba(var(--primary),.1).
- */
+/* Tokens live in src/ui/tokens.css (imported first in main.ts). This file still reads the legacy
+ * "r,g,b" aliases at the bottom of that file; Phase 7 moves each view onto the named tokens. */
 :root{
   /* Home-indicator inset on iPhone in standalone mode (needs viewport-fit=cover). */
   --safe-b:env(safe-area-inset-bottom, 0px);
-  --primary:71,114,250;
-  --on-primary:#fff;              /* text and icons on a primary fill */
-  --grey:25,25,25;                /* text colour; --t1..--t4 are its alphas */
-  --bg:255,255,255;
-  --rail:242,245,254;
-  --side:250,251,255;
-  --hover:25,25,25;
-  --pop:255,255,255;
-  --p-high:225,62,57; --p-med:250,168,12; --p-low:71,114,250;
-  --danger:225,62,57;             /* overdue, errors, the "now" line: red in every theme */
-  --toast-link:138,164,255;
-  --line:rgba(var(--grey),.06);
-  --t1:rgba(var(--grey),.9); --t2:rgba(var(--grey),.6); --t3:rgba(var(--grey),.4); --t4:rgba(var(--grey),.2);
-  --shadow:0 6px 24px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);
-  --radius:8px;
-  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --font-head:var(--font);
-  --font-num:var(--font);
-  color-scheme:light;
-}
-:root[data-mode="dark"]{
-  --grey:255,255,255; --bg:36,36,36; --rail:28,28,28; --side:32,32,32; --hover:255,255,255; --pop:44,44,44;
-  --line:rgba(255,255,255,.07); --shadow:0 6px 24px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
-  color-scheme:dark;
-}
-/* Quiet Sails: flour #F7F5F0, slate #2B2F33, rye #8C5A2B, grit #A39C90, moss #4E6B4A.
-   Priorities: high rye, medium ochre, low moss. Contrast: text ≥ 4.5:1, icons ≥ 3:1. */
-:root[data-family="sails"]{
-  --primary:140,90,43; --on-primary:#fff;
-  --grey:43,47,51; --bg:247,245,240; --rail:237,233,223; --side:242,239,232; --hover:43,47,51; --pop:251,250,246;
-  --p-high:140,90,43; --p-med:168,120,31; --p-low:78,107,74;
-  --danger:178,58,44; --toast-link:214,162,108;
-  --line:rgba(163,156,144,.32);
-  --shadow:0 6px 24px rgba(43,47,51,.14),0 1px 3px rgba(43,47,51,.1);
-  --font-head:"Libre Caslon Display",Georgia,serif;
-  --font-num:"IBM Plex Mono",ui-monospace,monospace;
-}
-:root[data-family="sails"][data-mode="dark"]{
-  --primary:201,146,90; --on-primary:rgb(43,47,51);
-  --grey:247,245,240; --bg:43,47,51; --rail:35,38,42; --side:39,42,46; --hover:247,245,240; --pop:52,57,62;
-  --p-high:201,146,90; --p-med:217,178,106; --p-low:143,175,134;
-  --danger:232,128,111;
-  --line:rgba(163,156,144,.2);
-  --shadow:0 6px 24px rgba(0,0,0,.45),0 1px 3px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%;margin:0}
-body{background:rgb(var(--bg));color:var(--t1);font:14px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow:hidden}
+body{background:rgb(var(--bg));color:var(--t1);font:var(--text-size)/1.45 var(--font);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 button:disabled{cursor:default}
 input,textarea,select{font:inherit;color:inherit}
@@ -65,14 +17,14 @@ svg{display:block}
 
 /* ===== icon rail ===== */
 .rail{width:52px;flex:none;background:rgb(var(--rail));display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:6px}
-.avatar{width:30px;height:30px;border-radius:50%;color:#fff;font-weight:600;font-size:12px;display:grid;place-items:center;flex:none}
+.avatar{width:30px;height:30px;border-radius:50%;color:var(--on-hue);font-weight:600;font-size:12px;display:grid;place-items:center;flex:none}
 #acct-btn{margin-bottom:10px}
 .rail-btn{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:var(--t3);position:relative}
 .rail-btn:hover{color:var(--t2);background:rgba(var(--hover),.05)}
 .rail-btn.on{color:rgb(var(--primary))}
 .rail-btn svg{width:22px;height:22px}
 .rail .grow{flex:1}
-.tip{position:absolute;left:44px;top:50%;transform:translateY(-50%);background:rgba(20,20,20,.9);color:#fff;font-size:12px;padding:3px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:50}
+.tip{position:absolute;left:44px;top:50%;transform:translateY(-50%);background:var(--text);color:var(--ground);font-size:12px;padding:3px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:50}
 .rail-btn:hover .tip{opacity:1;transition-delay:.4s}
 .sync svg{width:20px;height:20px}
 .sync.syncing svg{animation:spin 1s linear infinite;color:rgb(var(--primary))}
@@ -163,7 +115,7 @@ svg{display:block}
 .cb.p5{border-color:rgb(var(--p-high));background:rgba(var(--p-high),.08)}
 .cb.p3{border-color:rgb(var(--p-med));background:rgba(var(--p-med),.08)}
 .cb.p1{border-color:rgb(var(--p-low));background:rgba(var(--p-low),.08)}
-.cb svg{width:12px;height:12px;color:#fff;opacity:0;transform:scale(.6);transition:all .15s}
+.cb svg{width:12px;height:12px;color:var(--on-accent);opacity:0;transform:scale(.6);transition:all .15s}
 .cb.on{background:var(--t4);border-color:transparent}
 .cb.on svg{opacity:1;transform:none}
 .cb.on.p5,.cb.on.p3,.cb.on.p1{background:var(--t4);border-color:transparent}
@@ -277,9 +229,9 @@ svg{display:block}
 .invite input{flex:1;min-width:0;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:rgba(var(--grey),.03);outline:0}
 .invite .btn{flex:none}
 
-.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;background:rgba(30,30,30,.92);color:#fff;border-radius:8px;padding:10px 14px;display:flex;gap:16px;align-items:center;font-size:13px;transition:all .2s;z-index:200;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--text);color:var(--ground);box-shadow:var(--shadow-pop);border-radius:8px;padding:10px 14px;display:flex;gap:16px;align-items:center;font-size:13px;transition:all .2s;z-index:200;pointer-events:none}
 .toast.on{opacity:1;transform:translateX(-50%);pointer-events:auto}
-.toast button{color:rgb(var(--toast-link));font-weight:600}
+.toast button{color:color-mix(in oklab,var(--accent) 70%,var(--ground));font-weight:600}
 
 /* reminder cards */
 .rem-stack{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:150;width:320px;max-width:calc(100vw - 40px)}
@@ -386,7 +338,7 @@ svg{display:block}
 .matrix{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;height:calc(100vh - 80px);padding-bottom:16px}
 .quad{background:rgba(var(--grey),.025);border-radius:10px;padding:10px 6px 6px;display:flex;flex-direction:column;min-height:0}
 .quad h3{margin:0 8px 6px;font-size:14px;display:flex;align-items:center;gap:8px}
-.quad h3 .num{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;color:#fff;font-size:12px}
+.quad h3 .num{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;color:var(--on-hue);font-size:12px}
 .quad .list{flex:1;overflow:auto}
 .quad .row::after{left:36px}
 .quad .qa{height:34px;margin:4px 4px 0;background:none}
@@ -402,7 +354,7 @@ svg{display:block}
 .f-btns{display:flex;gap:12px}
 .ring{color:rgb(var(--primary))}
 .ring .time{color:var(--t1)}
-.ring.brk{color:rgb(52,178,107)}
+.ring.brk{color:var(--success)}
 .f-task{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);width:300px;max-width:100%}
 .f-task input{flex:1;min-width:0;border:0;outline:0;background:none;text-align:center;color:var(--t2);font-size:14px;padding:6px 0}
 .f-cycle{display:flex;gap:6px;margin-top:-14px}
@@ -423,7 +375,7 @@ svg{display:block}
 /* ===== habits ===== */
 .habit{display:flex;align-items:center;gap:14px;padding:12px 10px;border-radius:8px;border-bottom:1px solid var(--line)}
 .habit:hover{background:rgba(var(--hover),.02)}
-.h-ico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;flex:none}
+.h-ico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--on-hue);font-weight:600;flex:none}
 .h-info{flex:1;min-width:0}
 .h-info .s{font-size:12px;color:var(--t3)}
 .week{display:flex;gap:10px}
@@ -548,22 +500,16 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
 .row[draggable],.ev[draggable]{-webkit-touch-callout:none}
 .touch-ghost{opacity:.92;box-shadow:0 8px 24px rgba(0,0,0,.25);border-radius:8px;background:rgb(var(--bg))}
 
-/* ===== Quiet Sails type: Caslon headings, Plex Mono for dates and counts, sans for task text ===== */
-:root[data-family="sails"] .topbar h1{font-family:var(--font-head);font-weight:400;font-size:24px;letter-spacing:.01em}
-:root[data-family="sails"] .brand,
-:root[data-family="sails"] .quad h3,
-:root[data-family="sails"] .empty b{font-family:var(--font-head);font-weight:400}
-:root[data-family="sails"] .brand{font-size:24px}
-:root[data-family="sails"] .quad h3{font-size:16px}
-:root[data-family="sails"] :is(.row .meta .due,.sec-h .n,.nav-item .cnt,.pop .mi .kbd,.cell .d,.tg-dh b,.tg-hours,.tg-gut,.blk .bs,.ring .time,.stat .v,.d-date span,.rec > span:last-child,.wd button.part,.wd button.on,.more){font-family:var(--font-num);font-variant-numeric:tabular-nums}
-:root[data-family="sails"] :is(.row .meta .due,.blk .bs,.tg-hours,.nav-item .cnt,.sec-h .n){font-size:11.5px;letter-spacing:-.01em}
-:root[data-family="sails"] .ring .time{font-weight:400;letter-spacing:0}
-:root[data-family="sails"] .stat .v{font-weight:500}
+/* ===== Martian Mono for real data only (T3, T12): times, dates, counts, durations ===== */
+:is(.row .meta .due,.sec-h .n,.nav-item .cnt,.pop .mi .kbd,.cell .d,.tg-dh b,.tg-hours,.tg-gut,.blk .bs,.ring .time,.stat .v,.d-date span,.rec > span:last-child,.wd button.part,.wd button.on,.more){font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+:is(.row .meta .due,.blk .bs,.tg-hours,.nav-item .cnt,.sec-h .n){font-size:calc(var(--text-size) * var(--mono-scale) - 1.5px);letter-spacing:-.01em}
+.ring .time{font-weight:400;letter-spacing:-.02em}
+.stat .v{font-weight:500}
 
 /* theme picker */
 .theme-opt{gap:10px}
 .sws{display:flex;gap:4px}
-.sw{width:22px;height:22px;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(128,128,128,.35);display:flex;align-items:flex-end;justify-content:center;gap:2px;padding-bottom:4px}
+.sw{width:22px;height:22px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--line-c);display:flex;align-items:flex-end;justify-content:center;gap:2px;padding-bottom:4px}
 .sw i{width:5px;height:5px;border-radius:50%}
 .theme-opt .kbd svg{width:14px;height:14px;color:rgb(var(--primary))}
 .theme-mode{margin:6px 4px 4px}

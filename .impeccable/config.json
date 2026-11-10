@@ -2,16 +2,6 @@
   "detector": {
     "ignoreRules": [],
     "ignoreFiles": [],
-    "ignoreValues": [
-      {
-        "rule": "low-contrast",
-        "value": "*",
-        "files": [
-          "dev-notes/brand/previews/colour-sheet.html"
-        ],
-        "createdAt": "2026-11-10T18:08:30.173Z",
-        "reason": "Claude: static check assumes #ffffff ground; rendered body is #0C1517 and in-page WCAG badges all pass"
-      }
-    ]
+    "ignoreValues": []
   }
 }

@@ -1,0 +1,78 @@
+/* ===== xairos design tokens =====
+ * The brand kit as CSS. Approved at Gate A on 2026-11-10. The source decisions are in the brand
+ * brief (palette C1–C23, type T1–T12, motion M1–M12, identity I1–I14, Gate A G6–G11).
+ *
+ * Dark is the default look. :root holds the light values, and theme.ts sets
+ * data-mode="dark" on <html> (index.html does it before first paint).
+ *
+ * Rules:
+ * - Orchid (--accent) is a solid fill on one small thing (a button, a checked box, the active
+ *   icon, a dot), or a tint mixed in OKLab. Never mix it in OKLCH: the hue path from orchid
+ *   (343°) to the teal ground (213°) runs through blue.
+ * - Martian Mono is only for real data (times, dates, the timer, counts, durations) and short
+ *   strings. Set it at --mono-scale of the text beside it.
+ * - Exits are faster than entrances. Only the streak milestone uses --dur-4.
+ */
+:root{
+  /* ground and surfaces: "chart paper" */
+  --ground:#EEF2EA; --surface:#FAFCF7; --raised:#E2E8DC; --line-c:#CBD5C4;
+  --rail-c:#E1E7DB; --side-c:#E7ECE2;
+  /* text: olive ink */
+  --text:#23271A; --text-2:#50553E; --text-3:#5E634C;
+  /* accent: orchid */
+  --accent:#A0447E; --on-accent:#FFFFFF; --accent-line:#DFACCA;
+  --on-hue:#FFFFFF; /* text on a habit or list hue fill */
+  /* semantic */
+  --prio-high:#C9372C; --prio-med:#8A6100; --prio-low:#3B5FD9;
+  --success:#2F7A3A; --info:#2D6AA6; --warning:#8A6100; --danger-c:#C9372C;
+  /* habit hues: oklch(var(--hab-l) var(--hab-c) <hue>), hues 25 55 85 120 150 185 215 250 290 + rose-grey */
+  --hab-l:.52; --hab-c:.14; --hab-rose:oklch(.52 .05 15);
+  --grain:.05;
+  --shadow-pop:0 8px 24px rgba(43,47,51,.14),0 1px 3px rgba(43,47,51,.1);
+
+  /* type */
+  --font-sans:"Onest Variable","Onest",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"Martian Mono Variable","Martian Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --mono-scale:.88;
+  --text-size:15px; --row:36px;
+
+  /* shape */
+  --radius-lg:8px; --radius-sm:6px; --radius-pill:999px;
+
+  /* motion */
+  --ease-out:cubic-bezier(.16,1,.3,1); --ease-exit:cubic-bezier(.3,0,.8,.15);
+  --dur-1:120ms; --dur-2:200ms; --dur-3:320ms; --dur-4:600ms;
+
+  /* ----- legacy aliases: style.css still reads these "r,g,b" triplets. Phase 7 moves each
+     view onto the tokens above, then these go. ----- */
+  --primary:160,68,126; --on-primary:#FFFFFF;
+  --grey:35,39,26; --bg:238,242,234; --rail:225,231,219; --side:231,236,226; --hover:35,39,26; --pop:250,252,247;
+  --p-high:201,55,44; --p-med:138,97,0; --p-low:59,95,217;
+  --danger:201,55,44; --toast-link:223,172,202;
+  --line:var(--line-c);
+  --t1:var(--text); --t2:var(--text-2); --t3:var(--text-3); --t4:rgba(var(--grey),.24);
+  --shadow:var(--shadow-pop);
+  --radius:var(--radius-lg);
+  --font:var(--font-sans); --font-head:var(--font-sans); --font-num:var(--font-mono);
+  color-scheme:light;
+}
+:root[data-mode="dark"]{
+  --ground:#0C1517; --surface:#122022; --raised:#1A2B2D; --line-c:#26393B;
+  --rail-c:#091113; --side-c:#0F1B1D;
+  --text:#DCDDBD; --text-2:#A9AC8A; --text-3:#7E8168;
+  --accent:#D985B8; --on-accent:#1F0A18; --accent-line:#9D5682;
+  --on-hue:#0C1517;
+  --prio-high:#FF6A5C; --prio-med:#F2C14E; --prio-low:#7C9CFF;
+  --success:#8CCB7E; --info:#86B8E8; --warning:#F2C14E; --danger-c:#FF6A5C;
+  --hab-l:.76; --hab-c:.13; --hab-rose:oklch(.74 .045 15);
+  --grain:.07;
+  --shadow-pop:0 8px 24px rgba(0,0,0,.45),0 1px 3px rgba(0,0,0,.35);
+
+  --primary:217,133,184; --on-primary:#1F0A18;
+  --grey:220,221,189; --bg:12,21,23; --rail:9,17,19; --side:15,27,29; --hover:220,221,189; --pop:26,43,45;
+  --p-high:255,106,92; --p-med:242,193,78; --p-low:124,156,255;
+  --danger:255,106,92; --toast-link:217,133,184;
+  --t4:rgba(var(--grey),.2);
+  color-scheme:dark;
+}
+@media (max-width:760px){:root{--text-size:16px;--row:44px}}
