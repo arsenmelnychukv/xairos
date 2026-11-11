@@ -265,14 +265,14 @@ svg{display:block}
 .imp-notes{font-size:12px;color:var(--t3);margin:10px 8px 0;padding-left:16px}
 .imp-notes li{margin:2px 0}
 .yd-list{display:flex;flex-direction:column;margin:6px 0 12px;max-height:50vh;overflow:auto}
-.yd-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+.yd-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line-c)}
 .yd-row:last-child{border-bottom:0}
 .yd-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.yd-n small{margin-left:6px;font-size:12px;color:var(--t3)}
-.yd-b{width:30px;height:30px;border-radius:50%;border:1.5px dashed var(--t4);display:grid;place-items:center;color:transparent;flex:none}
+.yd-n small{margin-left:6px;font-size:12.5px;color:var(--text-3)}
+.yd-b{width:30px;height:30px;border-radius:var(--radius-sm);border:1.5px dashed var(--text-3);display:grid;place-items:center;color:transparent;flex:none;transition:background var(--dur-1) var(--ease-out),border-color var(--dur-1) var(--ease-out)}
 .yd-b svg{width:15px;height:15px}
-.yd-b:hover{border-color:rgb(var(--c));color:rgba(var(--c),.5)}
-.yd-b.on{border:0;background:rgb(var(--c));color:#fff}
+.yd-b:hover{border-color:var(--hc);color:color-mix(in oklab,var(--hc) 60%,transparent)}
+.yd-b.on{border-color:var(--hc);background:var(--hc);color:var(--on-hue)}
 
 /* ===== calendar (Gate A): hour lines are structure, today is a neutral 3% tint plus an orchid date pill ===== */
 .cal{display:flex;flex-direction:column;height:100%}
@@ -404,67 +404,84 @@ svg{display:block}
 .stat .v{font-size:22px;font-weight:600}
 .rec{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid var(--line);color:var(--t2)}
 
-/* ===== habits ===== */
-.habit{display:flex;align-items:center;gap:14px;padding:12px 10px;border-radius:8px;border-bottom:1px solid var(--line)}
-.habit:hover{background:rgba(var(--hover),.02)}
-.h-ico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--on-hue);font-weight:600;flex:none}
+/* ===== habits (Gate A): a surface card per habit, square hue cells, a dashed cell for today, a Martian count at the end ===== */
+.habit{display:flex;align-items:center;gap:14px;min-height:56px;padding:6px 8px 6px 14px;margin-bottom:6px;border-radius:var(--radius-lg);background:var(--surface);border:1px solid var(--line-c);transition:background var(--dur-1) var(--ease-out),border-color var(--dur-1) var(--ease-out)}
+.habit:hover{background:color-mix(in oklab,var(--text) 3%,var(--surface))}
+.habit.sel{border-color:var(--accent-line);background:color-mix(in oklab,var(--accent) 9%,var(--surface))}
 .h-info{flex:1;min-width:0}
-.h-info .s{font-size:12px;color:var(--t3)}
-.week{display:flex;gap:10px}
-.wd{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--t3)}
-.wd button{width:26px;height:26px;border-radius:50%;border:1.5px dashed var(--t4);display:grid;place-items:center}
-.wd button.on{border:0;background:rgb(var(--c));color:#fff;font-size:11px;font-weight:600}
-.wd button:disabled{opacity:.35;cursor:default}
+.h-info .h-name{font-weight:500}
+.h-info .s{font-size:13px;color:var(--text-3)}
+.week{display:flex;gap:6px}
+.wd{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--text-3)}
+.wd button{width:26px;height:26px;border-radius:var(--radius-sm);border:0;background:var(--raised);display:grid;place-items:center;font-size:12px;color:var(--text-2);transition:background var(--dur-1) var(--ease-out)}
+.wd button:not(:disabled):hover{background:color-mix(in oklab,var(--hc) 28%,var(--raised))}
+.wd button.on{background:var(--hc);color:var(--on-hue);font-weight:500}
+.wd button.part{background:linear-gradient(0deg,var(--hc) var(--p),var(--raised) var(--p));color:var(--text);font-weight:500}
+/* Today's cell: dashed outline while it is still open (G9). */
+.wd.today{color:var(--text);font-weight:500}
+.wd.today button:not(.on){outline:1.5px dashed var(--text-3);outline-offset:-1.5px}
+.wd button:disabled{opacity:.4;cursor:default}
 .wd button{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 .wd button svg{width:14px;height:14px}
-.wd.today{color:rgb(var(--primary));font-weight:600}
-.wd button.part{border:0;font-size:11px;font-weight:600;color:rgb(var(--c));
-  background:radial-gradient(closest-side,rgb(var(--bg)) 78%,transparent 80% 100%),conic-gradient(rgb(var(--c)) var(--p),rgba(var(--c),.18) 0)}
-/* A met week marks its empty days with a small dot in the habit colour (display only). */
-.wd button.fill{border:1.5px solid rgba(var(--c),.35);background:radial-gradient(circle,rgb(var(--c)) 0 3px,transparent 3.5px)}
+/* A met week marks its empty days with a small dot in the habit hue (display only). */
+.wd button.fill{background:radial-gradient(circle,var(--hc) 0 3px,transparent 3.5px),var(--raised)}
 .wd button.fill:disabled{opacity:.7}
+.habit .stk{font-size:calc(var(--text-size) * var(--mono-scale));flex:none;min-width:40px;text-align:right;color:var(--text-2)}
 .h-info .s .ib{display:inline-block;width:12px;height:12px;vertical-align:-2px;margin-right:2px}
 .h-open{display:flex;align-items:center;gap:14px;flex:1;min-width:0;text-align:left;border-radius:6px}
 .h-open .h-info>span{display:block}
-.h-open:hover .h-name{text-decoration:underline;text-decoration-color:var(--t4);text-underline-offset:3px}
+.h-open:hover .h-name{text-decoration:underline;text-decoration-color:var(--text-3);text-underline-offset:3px}
+/* Milestone (M5): the one --dur-4 moment. The line rises in; the moment dot lands last. Reduced motion keeps a fade. */
+.logl{display:inline-flex;align-items:center;gap:8px;justify-self:start;font-family:var(--font-mono);font-size:calc(var(--text-size) * var(--mono-scale) - 1px);color:var(--text);padding:4px 12px;margin:0 0 8px;border:1px solid color-mix(in oklab,var(--hc) 40%,transparent);border-radius:var(--radius-pill);background:color-mix(in oklab,var(--hc) 10%,var(--ground));animation:milestone var(--dur-4) var(--ease-out) both}
+.logl .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:milestone-dot var(--dur-4) var(--ease-out) both}
+@keyframes milestone{from{opacity:0;transform:translateY(8px)}}
+@keyframes milestone-dot{0%,45%{opacity:0;transform:scale(0)}}
+@media (prefers-reduced-motion:reduce){@keyframes milestone{from{opacity:0}}@keyframes milestone-dot{from{opacity:0}}}
 
-/* habit detail */
-.hd-what{font-size:13px;color:var(--t3);margin:-4px 0 14px}
+/* habit detail: the heatmap is the habit's hue ramped into --raised (0, 28, 52, 76, 100%) in OKLab; the overview is orchid */
+.hd-what{font-size:13px;color:var(--text-3);margin:-4px 0 14px}
 .hd-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
-.hd-stats .v small{font-size:13px;font-weight:400;color:var(--t3)}
+.hd .stat{background:var(--surface);border:1px solid var(--line-c);border-radius:var(--radius-lg)}
+.hd-stats .v small{font-size:13px;font-weight:400;color:var(--text-3);font-family:var(--font-sans)}
 .hd-sec{margin-bottom:28px}
 .hd-head{display:flex;align-items:center;gap:4px;margin-bottom:10px}
-.hd-head h2{font-size:15px;font-weight:600;margin:0;flex:1}
-.icon-btn:disabled{opacity:.3;cursor:default;background:none}
+.hd-head h2{font-size:15px;font-weight:500;margin:0;flex:1}
 .hm-scroll{overflow-x:auto;padding-bottom:4px}
-.hm{--cell:12px;--gap:3px;display:grid;grid-template-columns:28px repeat(var(--weeks),var(--cell));column-gap:var(--gap);width:max-content;font-size:10px;color:var(--t3)}
+.hm{--cell:12px;--gap:3px;display:grid;grid-template-columns:28px repeat(var(--weeks),var(--cell));column-gap:var(--gap);width:max-content;font-size:11px;color:var(--text-3)}
 .hm-m{white-space:nowrap;height:16px;overflow:visible}
 .hm-days{display:grid;grid-template-rows:repeat(7,var(--cell));row-gap:var(--gap);line-height:var(--cell)}
 .hm-grid{grid-column:2/-1;display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,var(--cell));grid-auto-columns:var(--cell);gap:var(--gap)}
-.hm-c{display:block;width:var(--cell);height:var(--cell);border-radius:3px;background:rgba(var(--grey),.07);padding:0;border:0}
+.hm-c{display:block;width:var(--cell);height:var(--cell);border-radius:2px;background:var(--raised);padding:0;border:0}
 .hm-c.out{background:none}
-.hm-c.part{background:rgba(var(--c),.4)}
-.hm-c.done{background:rgb(var(--c))}
-.hm-c.over{background:rgb(var(--c));box-shadow:inset 0 0 0 2.5px rgba(var(--bg),.55)}
-.hm-c.fill{background:radial-gradient(circle,rgb(var(--c)) 0 2px,rgba(var(--c),.14) 2.5px)}
+.hm-c.part{background:color-mix(in oklab,var(--hc) 52%,var(--raised))}
+.hm-c.done{background:var(--hc)}
+.hm-c.over{background:var(--hc);box-shadow:inset 0 0 0 2.5px color-mix(in oklab,var(--ground) 55%,transparent)}
+.hm-c.fill{background:color-mix(in oklab,var(--hc) 28%,var(--raised))}
 button.hm-c.fill:disabled{opacity:.7}
-.hm-c.today{outline:1.5px solid var(--t2);outline-offset:1px}
-button.hm-c:not(:disabled):hover{outline:1.5px solid rgb(var(--c));outline-offset:1px}
+.hm-c.today{outline:1.5px solid var(--text-2);outline-offset:1px}
+button.hm-c:not(:disabled):hover{outline:1.5px solid var(--hc);outline-offset:1px}
 button.hm-c:disabled{opacity:.4;cursor:default}
 button.hm-c{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
-.hm-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--t3);margin-top:10px}
+.hm-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--text-3);margin-top:10px}
 .hm-legend span{display:flex;align-items:center;gap:6px}
 .hm-legend .hm-c{--cell:11px}
+.ov-grid{display:grid;grid-template-rows:repeat(7,12px);grid-auto-flow:column;grid-auto-columns:12px;gap:3px;width:max-content}
+.ov-c{display:block;border-radius:2px;background:var(--raised)}
+.ov-c.l1{background:color-mix(in oklab,var(--accent) 28%,var(--raised))}
+.ov-c.l2{background:color-mix(in oklab,var(--accent) 52%,var(--raised))}
+.ov-c.l3{background:color-mix(in oklab,var(--accent) 76%,var(--raised))}
+.ov-c.l4{background:var(--accent)}
+.ov-c.future{opacity:.4}
 .hd-bars{display:flex;align-items:flex-end;gap:6px;height:120px;max-width:560px}
-.hd-bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;font-size:11px;color:var(--t3);min-width:0}
-.hd-bar i{display:block;width:100%;max-width:28px;background:rgb(var(--c));border-radius:3px 3px 0 0;min-height:1px}
-.hd-bar .v{color:var(--t2);font-variant-numeric:tabular-nums}
-.hd-run{display:grid;grid-template-columns:minmax(150px,auto) 1fr 70px;align-items:center;gap:12px;font-size:13px;padding:7px 0;border-bottom:1px solid var(--line);max-width:560px}
-.hd-run .d{color:var(--t2)}
-.hd-run .b{height:6px;border-radius:3px;background:rgba(var(--grey),.06);overflow:hidden}
-.hd-run .b i{display:block;height:100%;background:rgb(var(--c));border-radius:3px}
+.hd-bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;font-size:11px;color:var(--text-3);min-width:0}
+.hd-bar i{display:block;width:100%;max-width:28px;background:var(--hc);border-radius:2px 2px 0 0;min-height:1px}
+.hd-bar .v{color:var(--text-2);font-variant-numeric:tabular-nums}
+.hd-run{display:grid;grid-template-columns:minmax(150px,auto) 1fr 70px;align-items:center;gap:12px;font-size:13px;padding:7px 0;border-bottom:1px solid var(--line-c);max-width:560px}
+.hd-run .d{color:var(--text-2)}
+.hd-run .b{height:6px;border-radius:3px;background:var(--raised);overflow:hidden}
+.hd-run .b i{display:block;height:100%;background:var(--hc);border-radius:3px}
 .hd-run .n{text-align:right;font-variant-numeric:tabular-nums}
-.hd-none{font-size:13px;color:var(--t3)}
+.hd-none{font-size:13px;color:var(--text-3)}
 
 /* search */
 .search-box{display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border-radius:var(--radius);background:rgba(var(--grey),.04);margin-bottom:12px}
@@ -518,8 +535,9 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
   .matrix{grid-template-columns:1fr;grid-template-rows:none;height:auto}
   .quad{min-height:200px}
   .week{gap:4px}
-  .habit{flex-wrap:wrap;row-gap:8px}
-  .habit .week{order:3;width:100%;justify-content:space-between;padding-left:52px}
+  .habit{flex-wrap:wrap;row-gap:8px;padding:8px 8px 10px 14px}
+  .habit .week{order:3;width:100%;justify-content:space-between}
+  .wd button{width:34px;height:34px}
   .hd-stats{grid-template-columns:1fr 1fr}
   .hd-run{grid-template-columns:1fr 70px}
   .hd-run .b{display:none}
@@ -533,7 +551,7 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
 .touch-ghost{opacity:.92;box-shadow:0 8px 24px rgba(0,0,0,.25);border-radius:8px;background:rgb(var(--bg))}
 
 /* ===== Martian Mono for real data only (T3, T12): times, dates, counts, durations ===== */
-:is(.sec-h .n,.nav-item .cnt,.pop .mi .kbd,.cell .d,.tg-dh b,.tg-hours,.blk .bs,.ring .time,.stat .v,.rec > span:last-child,.wd button.part,.wd button.on,.more){font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+:is(.sec-h .n,.nav-item .cnt,.pop .mi .kbd,.cell .d,.tg-dh b,.tg-hours,.blk .bs,.ring .time,.stat .v,.rec > span:last-child,.wd button.part,.wd button.on,.habit .stk,.more){font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 :is(.blk .bs,.tg-hours,.nav-item .cnt,.sec-h .n){font-size:calc(var(--text-size) * var(--mono-scale) - 1.5px);letter-spacing:-.01em}
 .ring .time{font-weight:400;letter-spacing:-.02em}
 .stat .v{font-weight:500}

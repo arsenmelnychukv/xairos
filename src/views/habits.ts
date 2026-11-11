@@ -9,6 +9,9 @@ import { closePop, menu, popover } from '../ui/popover';
 import { askNotify } from './reminders';
 import { go, render } from '../app';
 
+/** A habit's colour as a full CSS colour. */
+export const hueOf = (hb: Habit) => `rgb(${tc(hb.color)})`;
+
 const live = () => Object.values(S.habits).filter(x => !x.removed).sort((a, b) => (a.order || 0) - (b.order || 0));
 
 /** Tap a day: toggle (goal 1) or +1. */
@@ -35,14 +38,29 @@ function dayMenu(anchor: Element, id: string, day: string, after: () => void) {
   menu(anchor, items.map(([l, f]) => [l, () => { f(); after(); }] as [string, () => void]));
 }
 
+/** The goal in words, plus the reminder time. */
 function sub(hb: Habit): string {
-  const today = TODAY(), s = streak(hb, today, prefs.weekStart), pw = perWeekOf(hb), g = goalOf(hb);
-  const parts = s.n ? [`${s.n} ${s.unit}${s.n === 1 ? '' : 's'} streak`] : [];
-  if (pw) parts.push(`${doneInWeek(hb, today, prefs.weekStart)}/${pw} this week`);
-  if (g > 1) parts.push(`${countOn(hb, today)}/${g}${hb.unit ? ' ' + esc(hb.unit) : ''} today`);
+  const pw = perWeekOf(hb), g = goalOf(hb);
+  const what = pw ? `${pw} ${pw === 1 ? 'time' : 'times'} a week` : 'every day';
+  const parts = [g > 1 ? `${g}${hb.unit ? ' ' + esc(hb.unit) : ''} a day${pw ? ', ' + what : ''}` : what];
   if (hb.remind) parts.push(`${I.bell.replace('<svg', '<svg class="ib"')}${fmtTime(hb.remind)}`);
-  return parts.join(' · ') || (pw ? `${pw}× a week` : 'Every day');
+  return parts.join(' · ');
 }
+
+/** The count at the end of a row (Martian Mono): week progress, today's count, else the streak ("12d", "3w"). */
+function stk(hb: Habit): { txt: string; label: string } {
+  const today = TODAY(), pw = perWeekOf(hb), g = goalOf(hb), s = streak(hb, today, prefs.weekStart);
+  const label = s.n ? `${s.n} ${s.unit}${s.n === 1 ? '' : 's'} streak` : 'No streak';
+  if (pw) return { txt: `${doneInWeek(hb, today, prefs.weekStart)}/${pw}`, label: `${label}, ${doneInWeek(hb, today, prefs.weekStart)} of ${pw} this week` };
+  if (g > 1) return { txt: `${countOn(hb, today)}/${g}`, label: `${label}, ${countOn(hb, today)} of ${g} today` };
+  return { txt: s.n ? `${s.n}${s.unit[0]}` : '', label };
+}
+
+/** A 7, 30 or 100 day streak just reached: the log line plays once, as the one slow moment (M5). */
+const MILESTONES = [7, 30, 100];
+let mile: { id: string; n: number; at: number } | null = null;
+export const milestoneHtml = (hb: Habit) => mile && mile.id === hb.id && Date.now() - mile.at < 4000
+  ? `<span class="logl" role="status"><i class="dot" aria-hidden="true"></i>${mile.n}-day streak · ${esc(hb.name)}</span>` : '';
 
 function dayBtn(hb: Habit, k: string) {
   const d = new Date(k + 'T00:00'), n = countOn(hb, k), g = goalOf(hb), done = n >= g, future = k > TODAY();
@@ -58,12 +76,12 @@ export function renderHabits() {
   main.innerHTML = `
     <div class="topbar"><h1>Habit</h1><button class="icon-btn" id="h-add" aria-label="Add habit">${I.plus}</button></div>
     <div class="content">
-      ${habits.map(hb => `<div class="habit ${doneOn(hb, TODAY()) ? 'today-done' : ''}" style="--c:${tc(hb.color)}">
-        <button class="h-open" data-hd="${hb.id}" aria-label="${esc(hb.name)}: details"><span class="h-ico" style="background:rgb(${tc(hb.color)})">${esc((hb.name[0] || '?').toUpperCase())}</span>
-        <span class="h-info"><span class="h-name">${esc(hb.name)}</span><span class="s">${sub(hb)}</span></span></button>
+      ${habits.map(hb => { const c = stk(hb); return `<div class="habit ${doneOn(hb, TODAY()) ? 'today-done' : ''}" style="--hc:${hueOf(hb)}">
+        <button class="h-open" data-hd="${hb.id}" aria-label="${esc(hb.name)}: details"><span class="h-info"><span class="h-name">${esc(hb.name)}</span><span class="s">${sub(hb)}</span></span></button>
         <div class="week">${stripDays(hb, TODAY(), prefs.weekStart).map(k => dayBtn(hb, k)).join('')}</div>
+        <span class="stk" title="${c.label}" aria-label="${c.label}">${c.txt}</span>
         <button class="icon-btn" data-hm="${hb.id}" aria-label="More">${I.dots}</button>
-      </div>`).join('') || `<div class="empty">${emptyArt}<b>No habits yet</b><span>Small daily wins add up.</span></div>`}
+      </div>${milestoneHtml(hb)}`; }).join('') || `<div class="empty">${emptyArt}<b>No habits yet</b><span>Small daily wins add up.</span></div>`}
     </div>`;
   bindDays(main, renderHabits);
   main.querySelectorAll<HTMLElement>('[data-hm]').forEach(b => b.onclick = () => {
@@ -82,7 +100,14 @@ export function renderHabits() {
 export function bindDays(root: HTMLElement, after: () => void) {
   root.querySelectorAll<HTMLElement>('[data-h]').forEach(b => {
     let held = false, timer: ReturnType<typeof setTimeout> | undefined;
-    b.onclick = () => { if (held) { held = false; return; } tapHabit(b.dataset.h!, b.dataset.d!); after(); };
+    b.onclick = () => {
+      if (held) { held = false; return; }
+      const hb = S.habits[b.dataset.h!], was = hb && streak(hb, TODAY(), prefs.weekStart);
+      tapHabit(b.dataset.h!, b.dataset.d!);
+      const now = S.habits[b.dataset.h!], is = now && streak(now, TODAY(), prefs.weekStart);
+      if (was && is && is.unit === 'day' && is.n > was.n && MILESTONES.includes(is.n)) mile = { id: now!.id, n: is.n, at: Date.now() };
+      after();
+    };
     b.oncontextmenu = e => { e.preventDefault(); dayMenu(b, b.dataset.h!, b.dataset.d!, after); };
     // Touch: press and hold opens the same menu.
     b.onpointerdown = e => { if (e.pointerType === 'mouse') return; timer = setTimeout(() => { held = true; dayMenu(b, b.dataset.h!, b.dataset.d!, after); }, 450); };

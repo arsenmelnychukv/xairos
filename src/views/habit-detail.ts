@@ -1,13 +1,14 @@
 /** One habit's page (#/habits/<id>): stats, a year heatmap to fix past days, per-month counts and best streaks. */
 import type { Habit, Ymd } from '../types';
 import { $, esc } from '../lib/util';
-import { DOW, MON, TODAY, parseYmd } from '../lib/dates';
-import { countOn, dayLevel, goalOf, habitStats, metWeekFill, perMonth, perWeekOf, yearWeeks, type Run } from '../habits';
-import { S, prefs, tc, ui, upd } from '../store';
+import { DOW, MON, TODAY, addDays, parseYmd, ymd } from '../lib/dates';
+import { weekStartOf } from '../calendar';
+import { countOn, dayLevel, doneOn, goalOf, habitStats, metWeekFill, perMonth, perWeekOf, yearWeeks, type Run } from '../habits';
+import { S, prefs, ui, upd } from '../store';
 import { I } from '../ui/icons';
 import { menu } from '../ui/popover';
 import { go } from '../app';
-import { bindDays, habitEditor } from './habits';
+import { bindDays, habitEditor, hueOf, milestoneHtml } from './habits';
 
 const LEVEL_NAME = { none: 'not done', part: 'partly done', done: 'done', over: 'over goal' };
 
@@ -30,6 +31,19 @@ function heatmap(hb: Habit, year: number, today: Ymd): string {
     <div class="hm-days">${rows.map((r, i) => `<span>${i % 2 ? '' : r}</span>`).join('')}</div>
     <div class="hm-grid">${cells}</div>
   </div></div>`;
+}
+
+/** All habits, last 12 weeks, in orchid: each day's share of habits done (five steps, as on the board). */
+function overview(today: Ymd): string {
+  const hs = Object.values(S.habits).filter(x => !x.removed);
+  const start = addDays(weekStartOf(parseYmd(today), prefs.weekStart), -77);
+  const cells = Array.from({ length: 84 }, (_, i) => {
+    const d = ymd(addDays(start, i));
+    if (d > today || !hs.length) return `<i class="ov-c future"></i>`;
+    const n = hs.filter(x => doneOn(x, d)).length, lv = Math.round((n / hs.length) * 4);
+    return `<i class="ov-c l${lv}" title="${shortDate(d)}: ${n} of ${hs.length} habits"></i>`;
+  }).join('');
+  return `<div class="hm-scroll"><div class="ov-grid" role="img" aria-label="All habits, last 12 weeks">${cells}</div></div>`;
 }
 
 function legend(hb: Habit): string {
@@ -74,8 +88,9 @@ export function renderHabitDetail(id: string) {
       <h1>${esc(hb.name)}</h1>
       <button class="icon-btn" id="hd-more" aria-label="More">${I.dots}</button>
     </div>
-    <div class="content hd" style="--c:${tc(hb.color)}">
+    <div class="content hd" style="--hc:${hueOf(hb)}">
       <div class="hd-what">${what}</div>
+      ${milestoneHtml(hb)}
       <div class="hd-stats">
         <div class="stat"><div class="k">Current streak</div><div class="v">${st.current}<small> ${st.unit}${st.current === 1 ? '' : 's'}</small></div></div>
         <div class="stat"><div class="k">Best streak</div><div class="v">${st.best}<small> ${st.unit}${st.best === 1 ? '' : 's'}</small></div></div>
@@ -90,6 +105,7 @@ export function renderHabitDetail(id: string) {
         ${heatmap(hb, year, today)}
         ${legend(hb)}
       </section>
+      <section class="hd-sec"><div class="hd-head"><h2>All habits</h2></div>${overview(today)}</section>
       <section class="hd-sec"><div class="hd-head"><h2>Days done per month</h2></div>${monthBars(hb, year, today)}</section>
       <section class="hd-sec"><div class="hd-head"><h2>Best streaks</h2></div>${topRuns(st.top, st.unit)}</section>
     </div>`;
