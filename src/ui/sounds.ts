@@ -1,5 +1,5 @@
 /**
- * Sounds (M7, M12): synthesised with Web Audio, all off by default, each with its own setting.
+ * Sounds (M7, M12): synthesised with Web Audio, each with its own setting; only the focus-end bell is on by default.
  * They play only after the user has touched the page, so a browser never blocks or surprises.
  */
 export type SoundName = 'focusEnd' | 'breakEnd' | 'taskDone';
@@ -18,8 +18,11 @@ export const PLANS: Record<'focusEnd' | 'breakEnd', Note[]> = {
 /** The tick: 30 ms of noise through a band-pass filter. */
 export const TICK = { ms: 30, hz: 2400, q: 1.2, gain: .25 };
 
-/** Is this sound switched on? Off unless the setting is true. */
-export const soundOn = (p: SoundPrefs | undefined, name: SoundName) => p?.[name] === true;
+/** Sounds that are on until the user turns them off (M13): the focus-end bell. The rest are off until turned on. */
+export const ON_BY_DEFAULT: Record<SoundName, boolean> = { focusEnd: true, breakEnd: false, taskDone: false };
+
+/** Is this sound switched on? An unset setting takes the default; only an explicit value overrides it. */
+export const soundOn = (p: SoundPrefs | undefined, name: SoundName) => p?.[name] ?? ON_BY_DEFAULT[name];
 
 let ctx: AudioContext | null = null, unlocked = false;
 const GESTURES = ['pointerdown', 'touchstart', 'touchend', 'click', 'keydown'];

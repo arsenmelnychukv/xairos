@@ -14,7 +14,7 @@ import { I } from '../ui/icons';
 import { closePop, popover } from '../ui/popover';
 import { toast } from '../ui/toast';
 import { openTask } from './reminders';
-import { playSound, type SoundName } from '../ui/sounds';
+import { playSound, soundOn, type SoundName } from '../ui/sounds';
 import { go } from '../app';
 
 const settings = (): FocusSettings => ({ ...DEFAULT_FOCUS, ...(prefs.focus || {}) });
@@ -145,9 +145,9 @@ function settingsPop(anchor: Element) {
     <div class="fld"><span class="lab">Long break</span>${num('fs-e', s.longEvery, 2, 12, 'after this many')}</div>
     <div class="fld"><span class="lab"></span><label class="opt"><input type="checkbox" id="fs-a" ${s.autoStart ? 'checked' : ''}>Start breaks and the next focus by themselves</label></div>
     <div class="fld"><span class="lab">Sounds</span><span class="opts">
-      <label class="opt"><input type="checkbox" id="fs-sf" ${prefs.sounds?.focusEnd ? 'checked' : ''}>Bell when focus ends</label>
-      <label class="opt"><input type="checkbox" id="fs-sb" ${prefs.sounds?.breakEnd ? 'checked' : ''}>Two tones when a break ends</label>
-      <label class="opt"><input type="checkbox" id="fs-st" ${prefs.sounds?.taskDone ? 'checked' : ''}>Tick when a task is completed</label></span></div>
+      <label class="opt"><input type="checkbox" id="fs-sf" ${soundOn(prefs.sounds, 'focusEnd') ? 'checked' : ''}>Bell when focus ends</label>
+      <label class="opt"><input type="checkbox" id="fs-sb" ${soundOn(prefs.sounds, 'breakEnd') ? 'checked' : ''}>Two tones when a break ends</label>
+      <label class="opt"><input type="checkbox" id="fs-st" ${soundOn(prefs.sounds, 'taskDone') ? 'checked' : ''}>Tick when a task is completed</label></span></div>
     <div class="btns"><button class="btn sec" data-x>Cancel</button><button class="btn pri" data-ok>Save</button></div>`, 320);
   const n = (id: string, min: number, max: number, d: number) => Math.min(max, Math.max(min, Math.round(+$<HTMLInputElement>(id, p).value || d)));
   $('[data-x]', p).onclick = closePop;
