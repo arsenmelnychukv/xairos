@@ -11,12 +11,12 @@ export function shareDialog(anchor: Element, id: string) {
   const owner = isOwner(id);
   const roleSel = (u: string, role: Role) => owner
     ? `<select data-role="${u}"><option value="edit" ${role === 'edit' ? 'selected' : ''}>Can edit</option><option value="view" ${role === 'view' ? 'selected' : ''}>Can view</option></select><button class="icon-btn" data-rm="${u}" aria-label="Remove">${I.close}</button>`
-    : `<span style="font-size:12px;color:var(--t3)">${role === 'edit' ? 'Can edit' : 'Can view'}</span>`;
+    : `<span class="role">${role === 'edit' ? 'Can edit' : 'Can view'}</span>`;
   const ownerU = userOf(l.ownerId, 'Owner');
   const p = popover(anchor, `
     <h4>Share “${esc(l.name)}”</h4>
     ${owner ? `<div class="invite"><input id="sh-email" type="email" placeholder="Invite by email"><select id="sh-role"><option value="edit">Can edit</option><option value="view">Can view</option></select><button class="btn pri" id="sh-go">Invite</button></div><div class="err" id="sh-err"></div>` : ''}
-    <div class="member">${avatarHtml(ownerU)}<div class="who"><div>${esc(ownerU.name)}${l.ownerId === me() ? ' (you)' : ''}</div><div>${esc(ownerU.email || '')}</div></div><span style="font-size:12px;color:var(--t3)">Owner</span></div>
+    <div class="member">${avatarHtml(ownerU)}<div class="who"><div>${esc(ownerU.name)}${l.ownerId === me() ? ' (you)' : ''}</div><div>${esc(ownerU.email || '')}</div></div><span class="role">Owner</span></div>
     ${Object.entries(l.members || {}).map(([u, role]) => { const usr = S.users[u] || { id: u, name: 'Unknown user', email: '' }; return `<div class="member">${avatarHtml(usr)}<div class="who"><div>${esc(usr.name)}${u === me() ? ' (you)' : ''}</div><div>${esc(usr.email || '')}</div></div>${roleSel(u, role)}</div>`; }).join('')}
     <div class="note">${owner ? 'Invitees must already have a xairos account.' : 'Only the owner can change sharing.'}</div>`, 360);
   if (!owner) return;

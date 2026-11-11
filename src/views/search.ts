@@ -12,7 +12,7 @@ export function renderSearch() {
     if (!q) { res.innerHTML = `<div class="empty">${emptyArt}<span>Find anything by title, description or #tag</span></div>`; return; }
     const hits = live().filter(t => (t.title || '').toLowerCase().includes(q) || (t.desc || '').toLowerCase().includes(q) || (t.tags || []).some(g => g.includes(q.replace(/^#/, ''))));
     res.innerHTML = hits.length
-      ? `<div class="sec-h" style="cursor:default">${hits.length} result${hits.length > 1 ? 's' : ''}</div>` + sortTasks(hits).map(t => rowHtml(t, { showList: true, q: ui.query.trim() })).join('')
+      ? `<div class="sec-h" style="cursor:default"><span class="n">${hits.length}</span> result${hits.length > 1 ? 's' : ''}</div><div class="search-res">` + sortTasks(hits).map(t => rowHtml(t, { showList: true, q: ui.query.trim() })).join('') + '</div>'
       : `<div class="empty"><span>No results for “${esc(ui.query)}”</span></div>`;
     bindRows(res, false);
   };
