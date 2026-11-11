@@ -15,6 +15,7 @@ import { tasksCsv, tasksIcs } from '../lib/export';
 import { deleteAccountDialog, signOut, switchAccount } from './auth';
 import { render } from '../app';
 import { isOwnBackup } from '../lib/rename';
+import markUrl from '../../assets/icon.svg';
 
 const hhmm = (ms: number) => new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -40,9 +41,10 @@ export function renderRail() {
     ['habits', 'Habit Tracker', I.habit, '#/habits'], ['search', 'Search', I.search, '#/search'],
   ];
   const rail = $('#rail');
-  rail.innerHTML = `<button class="rail-btn" id="acct-btn" aria-label="Account">${avatarHtml(sess().user)}</button>` +
-    items.map(([k, n, ic, href]) => `<a class="rail-btn ${ui.route === k ? 'on' : ''}" href="${href}" aria-label="${n}">${ic}<span class="tip">${n}</span></a>`).join('') +
-    `<div class="grow"></div><button class="rail-btn sync" id="sync-btn" aria-label="Sync now"></button><button class="rail-btn" id="theme-btn" aria-label="Theme">${isDark() ? I.sun : I.moon}<span class="tip">Theme</span></button>`;
+  // The χ mark on top, the views, then sync, theme and the account at the bottom (Gate A shell).
+  rail.innerHTML = `<span class="logo"><img src="${markUrl}" alt="xairos" width="30" height="30"></span>` +
+    items.map(([k, n, ic, href]) => `<a class="rail-btn ${ui.route === k ? 'on' : ''}" data-k="${k}" href="${href}" aria-label="${n}" ${ui.route === k ? 'aria-current="page"' : ''}>${ic}<span class="tip">${n}</span></a>`).join('') +
+    `<div class="grow"></div><button class="rail-btn sync" id="sync-btn" aria-label="Sync now"></button><button class="rail-btn" id="theme-btn" aria-label="Theme">${isDark() ? I.sun : I.moon}<span class="tip">Theme</span></button><button class="rail-btn" id="acct-btn" aria-label="Account">${avatarHtml(sess().user)}</button>`;
   updateSyncBtn($('#sync-btn'));
   $('#sync-btn').onclick = () => doSync();
   $('#theme-btn').onclick = e => themeMenu(e.currentTarget as Element);

@@ -1,6 +1,6 @@
 import type { RepeatRule, Task } from '../types';
 import { $, esc, uid } from '../lib/util';
-import { DOW, addDays, fmtTime, nextMonday, parseYmd, todayD, ymd } from '../lib/dates';
+import { DOW, MON, addDays, fmtTime, nextMonday, parseYmd, todayD, ymd } from '../lib/dates';
 import { allZones, deviceTz, tzCity, when } from '../lib/tz';
 import { firstOccurrence, repeatLabel } from '../recurrence';
 import { trashDaysLeft, trashedAt } from '../lib/trash';
@@ -12,8 +12,8 @@ import { closePop, menu, popover, promptPop } from '../ui/popover';
 import { del, moveTo, toggleDone } from '../actions';
 import { askNotify } from './reminders';
 import { focusedOn } from './focus';
+import { fmtMins } from '../focus';
 
-const fmtMins = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`);
 import { render } from '../app';
 
 const autosize = (el: HTMLElement) => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; };
@@ -31,32 +31,40 @@ export function renderDetail() {
   const l = S.lists[t.listId], shared = isShared(l);
   const people = peopleOf(l);
   const dueTxt = t.due ? dueText(t, true) : 'Due date';
+  const PRIO = { 5: 'High', 3: 'Medium', 1: 'Low' } as Record<number, string>;
+  const made = new Date(t.created || Date.now());
+  const doneN = (t.items || []).filter(i => i.done).length;
+  const remTxt = t.reminders?.length && t.due ? t.reminders.map(m => REM_OPTS.find(o => o[0] === m)?.[1] || m + ' min early').join(', ') + (t.time ? '' : ' (9:00 AM)') : '';
   pane.innerHTML = `
     <div class="d-top">
-      <button class="cb ${p ? 'p' + p : ''} ${t.done ? 'on' : ''}" id="d-cb" aria-label="Complete" ${ro ? 'disabled' : ''}>${I.check}</button>
-      <button class="d-date ${t.due ? (dueCls(t) === 'late' ? 'late' : 'set') : ''}" id="d-date" ${ro ? 'disabled' : ''}>${I.cal}<span>${dueTxt}</span>${t.repeat ? small(I.repeat) : ''}${t.reminders?.length ? small(I.bell) : ''}</button>
       <span class="sp"></span>
       ${shared ? `<button class="icon-btn" id="d-assign" aria-label="Assign" ${ro ? 'disabled' : ''}>${t.assignee ? avatarHtml(S.users[t.assignee] || { id: t.assignee, name: '?' }, 22) : I.person}</button>` : ''}
-      <button class="icon-btn flag ${p ? 'p' + p : ''}" id="d-flag" aria-label="Priority" ${ro ? 'disabled' : ''}>${p ? I.flagf : I.flag}</button>
       <button class="icon-btn" id="d-close" aria-label="Close">${I.close}</button>
     </div>
     ${ro ? `<div class="d-ro">${t.deleted ? `In Trash — restore it to edit.${trashedAt(t) > 0 ? ` Deleted for good in ${trashDaysLeft(t) === 1 ? '1 day' : trashDaysLeft(t) + ' days'}.` : ''}` : 'View only — shared by ' + esc(userName(l?.ownerId))}</div>` : ''}
     <div class="d-body">
-      <textarea class="d-title" id="d-title" rows="1" placeholder="What would you like to do?" ${ro ? 'disabled' : ''}>${esc(t.title)}</textarea>
-      <textarea class="d-desc" id="d-desc" placeholder="Description" ${ro ? 'disabled' : ''}>${esc(t.desc)}</textarea>
-      <div id="d-items">${(t.items || []).map(i => `<div class="ck ${i.done ? 'done' : ''}" data-i="${i.id}"><button class="cb round ${i.done ? 'on' : ''}" data-icb ${ro ? 'disabled' : ''}>${I.check}</button><input value="${esc(i.title)}" ${ro ? 'disabled' : ''}>${ro ? '' : `<button class="icon-btn x" data-ix aria-label="Remove subtask">${I.close}</button>`}</div>`).join('')}</div>
+      <div class="d-tt"><button class="cb ${t.done ? 'on' : ''}" id="d-cb" aria-label="Complete" ${ro ? 'disabled' : ''}>${I.check}</button>
+        <textarea class="d-title" id="d-title" rows="1" placeholder="What would you like to do?" ${ro ? 'disabled' : ''}>${esc(t.title)}</textarea></div>
+      <div class="props">
+        <button class="prop" id="d-date" ${ro ? 'disabled' : ''}>${I.cal}<span class="k">Due</span><span class="v ${t.due ? (dueCls(t) === 'late' ? 'late' : 'set') : 'none'}">${dueTxt}${t.repeat ? small(I.repeat) : ''}</span></button>
+        <button class="prop" id="d-flag" ${ro ? 'disabled' : ''}><span class="flag ${p ? 'p' + p : ''}">${p ? I.flagf : I.flag}</span><span class="k">Priority</span><span class="v">${p ? `<span class="pm p${p}" aria-hidden="true"></span>` : ''}${PRIO[p || 0] || 'None'}</span></button>
+        <button class="prop" id="d-list" ${ro ? 'disabled' : ''}>${I.tag}<span class="k">List</span><span class="v"><span class="dot" style="background:rgb(${listColor(t.listId)})"></span>${esc(listName(t.listId))}</span></button>
+        ${remTxt ? `<button class="prop" id="d-rem" ${ro ? 'disabled' : ''}>${I.bell}<span class="k">Reminder</span><span class="v">${esc(remTxt)}</span></button>` : ''}
+      </div>
+      ${(t.items || []).length || !ro ? `<span class="lbl">Subtasks${(t.items || []).length ? ` <span class="mono">${doneN}/${t.items.length}</span>` : ''}</span>` : ''}
+      <div id="d-items">${(t.items || []).map(i => `<div class="ck ${i.done ? 'done' : ''}" data-i="${i.id}"><button class="cb ${i.done ? 'on' : ''}" data-icb ${ro ? 'disabled' : ''}>${I.check}</button><input value="${esc(i.title)}" ${ro ? 'disabled' : ''}>${ro ? '' : `<button class="icon-btn x" data-ix aria-label="Remove subtask">${I.close}</button>`}</div>`).join('')}</div>
       ${ro ? '' : `<label class="add-ck">${I.plus}<input id="d-add" placeholder="Add subtask"></label>`}
+      <span class="lbl">Notes</span>
+      <textarea class="d-desc" id="d-desc" placeholder="Add notes" ${ro ? 'disabled' : ''}>${esc(t.desc)}</textarea>
       <div class="d-tags">${(t.tags || []).map(g => `<span class="tag">#${esc(g)}</span>`).join('')}</div>
       <div class="d-info">
-        ${t.repeat ? `<div>${I.repeat}${esc(repeatLabel(t.repeat))}</div>` : ''}
-        ${t.reminders?.length && t.due ? `<div>${I.bell}${t.reminders.map(m => REM_OPTS.find(o => o[0] === m)?.[1] || m + ' min early').join(', ')}${t.time ? '' : ' (9:00 AM)'}</div>` : ''}
         ${t.snooze ? `<div>${I.bell}Snoozed until ${new Date(t.snooze).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</div>` : ''}
         ${focusedOn(t.id) ? `<div>${I.focus}Focused ${fmtMins(focusedOn(t.id))}</div>` : ''}
         ${shared ? `<div>${I.person}Created by ${esc(userName(t.createdBy))}${t.assignee ? ` · Assigned to ${esc(userName(t.assignee))}` : ''}</div>` : ''}
       </div>
     </div>
     <div class="d-foot">
-      <button class="lst" id="d-list" ${ro ? 'disabled' : ''}><span class="dot" style="background:rgb(${listColor(t.listId)})"></span>${esc(listName(t.listId))}</button>
+      <span class="mono d-created">created ${made.getDate()} ${MON[made.getMonth()]}</span>
       ${ro ? '' : `<div style="display:flex;gap:2px"><button class="icon-btn" id="d-tag" aria-label="Tags">${I.tag}</button><button class="icon-btn" id="d-del" aria-label="Delete">${I.trash}</button></div>`}
     </div>`;
   const title = $<HTMLTextAreaElement>('#d-title'), desc = $<HTMLTextAreaElement>('#d-desc');
@@ -71,9 +79,10 @@ export function renderDetail() {
   const setP = (v: number) => { touch(Object.assign(t, { priority: v })); render(); };
   $('#d-flag').onclick = e => menu(e.currentTarget as Element, [
     [`<span class="flag p5">${I.flagf}</span>High`, () => setP(5)], [`<span class="flag p3">${I.flagf}</span>Medium`, () => setP(3)],
-    [`<span class="flag p1">${I.flagf}</span>Low`, () => setP(1)], [`<span class="flag" style="color:var(--t3)">${I.flag}</span>None`, () => setP(0)],
+    [`<span class="flag p1">${I.flagf}</span>Low`, () => setP(1)], [`<span class="flag">${I.flag}</span>None`, () => setP(0)],
   ], true);
   $('#d-date').onclick = e => datePicker(e.currentTarget as Element, t);
+  $('#d-rem')?.addEventListener('click', e => datePicker(e.currentTarget as Element, t));
   const as = $('#d-assign');
   if (as) as.onclick = e => menu(e.currentTarget as Element, [
     ['Unassigned', () => { touch(Object.assign(t, { assignee: null })); render(); }, !t.assignee],

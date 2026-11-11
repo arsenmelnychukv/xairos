@@ -10,6 +10,8 @@ import { closePop, menu, popover } from '../ui/popover';
 import { toast } from '../ui/toast';
 import { shareDialog } from './share';
 import { go, render } from '../app';
+import wmDark from '../../assets/wordmark.svg';
+import wmLight from '../../assets/wordmark-light.svg';
 
 export const SMART_KEYS = ['today', 'tomorrow', 'week', 'all', 'assigned', 'completed', 'trash'];
 
@@ -47,14 +49,14 @@ export function renderSide() {
   const lc = prefs.sideClosed.lists, tagsClosed = prefs.sideClosed.tags;
   const anyShared = Object.values(S.lists).some(l => isShared(l) && !l.removed);
   const listRow = (l: List) => `<div class="nav-item ${ui.listKey === l.id ? 'on' : ''}" data-k="${l.id}" data-list="${l.id}" data-drop="list" data-v="${l.id}"><span class="dot" style="background:rgb(${tc(l.color)})"></span><span class="name">${esc(l.name)}</span>${isShared(l) ? `<span class="shared" title="${l.ownerId === me() ? 'Shared' : 'Shared by ' + esc(userName(l.ownerId))}">${I.users}</span>` : ''}<span class="cnt">${countFor(l.id) || ''}</span></div>`;
-  side.innerHTML = `<div class="side-scroll">
+  side.innerHTML = `<div class="side-brand"><img class="wm wm-dark" src="${wmDark}" alt="xairos" height="22"><img class="wm wm-light" src="${wmLight}" alt="xairos" height="22"></div><div class="side-scroll">
     ${nav('today', ico(todayIco), 'Today', 'data-drop="smart" data-v="today"')}${nav('tomorrow', ico(I.tomorrow), 'Tomorrow', 'data-drop="smart" data-v="tomorrow"')}${nav('week', ico(I.week), 'Next 7 Days')}${nav(inboxId(), ico(I.inbox), 'Inbox', `data-drop="list" data-v="${inboxId()}"`)}
     ${anyShared ? nav('assigned', ico(I.person), 'Assigned to Me') : ''}
     <div class="side-sep"></div>
     <div class="side-head ${lc ? 'closed' : ''}"><span class="caret" data-fold="lists">Lists ${I.caret}</span><button id="add-list" aria-label="Add list">${I.plus}</button></div>
     ${lc ? '' : userLists().map(listRow).join('')}
     <div class="side-head ${tagsClosed ? 'closed' : ''}"><span class="caret" data-fold="tags">Tags ${I.caret}</span></div>
-    ${tagsClosed ? '' : (allTags().map(t => nav('tag:' + t, ico(I.tag), t, `data-drop="tag" data-v="${esc(t)}"`)).join('') || '<div class="nav-item" style="color:var(--t3);cursor:default;font-size:12px">Type #tag when adding tasks</div>')}
+    ${tagsClosed ? '' : (allTags().map(t => nav('tag:' + t, ico(I.tag), t, `data-drop="tag" data-v="${esc(t)}"`)).join('') || '<div class="nav-item" style="color:var(--text-3);cursor:default;font-size:13px">Type #tag when adding tasks</div>')}
     <div class="side-sep"></div>
     ${nav('all', ico(I.list), 'All')}${nav('completed', ico(I.done), 'Completed', '', false)}${nav('trash', ico(I.trash), 'Trash', 'data-drop="trash"', false)}
   </div>`;

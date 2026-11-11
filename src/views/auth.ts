@@ -9,12 +9,15 @@ import { readHash, render } from '../app';
 import { disablePush } from '../push';
 import { closePop, popover } from '../ui/popover';
 import { toast } from '../ui/toast';
+import markUrl from '../../assets/icon.svg';
+import wmDark from '../../assets/wordmark.svg';
+import wmLight from '../../assets/wordmark-light.svg';
 
 export function renderAuth(mode: 'signin' | 'signup' = 'signin', err = '') {
   $('#app').hidden = true;
   const a = $('#auth'); a.hidden = false;
   a.innerHTML = `<form class="auth-card" id="auth-form" novalidate>
-    <div class="brand"><span class="logo">${I.check}</span>xairos</div>
+    <div class="brand"><img class="mark" src="${markUrl}" alt="" width="72" height="72"><img class="wm wm-dark" src="${wmDark}" alt="xairos" height="40"><img class="wm wm-light" src="${wmLight}" alt="xairos" height="40"></div>
     <div class="auth-sub">Plan your day. Keep every device in step.</div>
     <div class="tabs"><button type="button" data-m="signin" class="${mode === 'signin' ? 'on' : ''}">Sign in</button><button type="button" data-m="signup" class="${mode === 'signup' ? 'on' : ''}">Create account</button></div>
     ${mode === 'signup' ? `<label for="a-name">Name</label><input id="a-name" autocomplete="name" required>` : ''}
