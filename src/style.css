@@ -376,33 +376,45 @@ svg{display:block}
 .quad .qa{height:34px;margin:4px 4px 0;background:none}
 .quad .qa:focus-within{background:rgb(var(--bg))}
 
-/* ===== focus ===== */
+/* ===== focus (Gate A): the big Martian timer, a continuous orchid line, the task as a Today-style row ===== */
 .focus{display:flex;gap:40px;height:100%;padding-top:10px}
-.focus-l{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;min-width:0}
-.ring{position:relative;width:280px;height:280px}
-.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.ring .time{position:absolute;inset:0;display:grid;place-items:center;font-size:52px;font-weight:300;font-variant-numeric:tabular-nums;letter-spacing:1px}
-.ring .lbl{position:absolute;left:0;right:0;top:64%;text-align:center;font-size:13px;color:var(--t3)}
-.f-btns{display:flex;gap:12px}
-.ring{color:rgb(var(--primary))}
-.ring .time{color:var(--t1)}
-.ring.brk{color:var(--success)}
-.f-task{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);width:300px;max-width:100%}
-.f-task input{flex:1;min-width:0;border:0;outline:0;background:none;text-align:center;color:var(--t2);font-size:14px;padding:6px 0}
-.f-cycle{display:flex;gap:6px;margin-top:-14px}
-.f-cycle i{width:8px;height:8px;border-radius:50%;background:rgba(var(--grey),.12)}
-.f-cycle i.on{background:rgb(var(--primary))}
-.rec-task{border:0;background:none;padding:0;font:inherit;font-size:12px;color:rgb(var(--primary));cursor:pointer;text-align:left}
-.rec-task:hover{text-decoration:underline}
-.rec-note{color:var(--t3);font-size:12px}
+.focus-l{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;min-width:0}
+.f-phase{font-size:calc(var(--text-size) * var(--mono-scale));color:var(--text-2)}
+.f-clock{font-size:clamp(64px,11vw,104px);line-height:1;font-weight:400;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--text)}
+/* Progress: one line, scaled from the left. It moves linearly between the 250ms updates, so there are no ticks. */
+.f-track{width:min(460px,100%);height:3px;border-radius:2px;background:var(--raised);overflow:hidden}
+.f-track b{display:block;height:100%;background:var(--accent);transform-origin:0 50%;transition:transform 260ms linear;will-change:transform}
+.f-track.brk b{background:var(--text-3)}
+.f-task{display:flex;align-items:center;gap:10px;min-height:var(--row);padding:0 8px 0 14px;width:min(460px,100%);box-sizing:border-box;background:var(--surface);border:1px solid var(--line-c);border-radius:var(--radius-lg)}
+.f-task input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--text);padding:6px 0}
+.f-task input::placeholder{color:var(--text-3)}
+.f-task:focus-within{border-color:var(--accent-line)}
+.f-task .cb{pointer-events:none}
+.f-task .cb.on{background:var(--text-3);border-color:var(--text-3)}
+.f-task .cb.on svg{color:var(--ground)}
+.f-dur{flex:none;font-size:calc(var(--text-size) * var(--mono-scale));color:var(--text-3)}
+.f-cycle{display:flex;gap:6px}
+.f-cycle i{width:8px;height:8px;border-radius:50%;background:var(--raised)}
+.f-cycle i.on{background:var(--accent)}
+.f-btns{display:flex;gap:10px;margin-top:6px}
+.f-btns .btn{flex:none;margin:0;min-width:112px;height:40px;border-radius:var(--radius-sm);font-size:15px;justify-content:center}
+.rec-task{border:0;background:none;padding:0;font:inherit;color:var(--text);cursor:pointer;text-align:left;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-task:hover{text-decoration:underline;text-decoration-color:var(--text-3);text-underline-offset:3px}
+.rec-note{color:var(--text-2)}
 .fp-list{max-height:280px;overflow:auto;margin-top:6px}
-.f-btns .btn{flex:none;width:120px;height:40px;border-radius:20px;font-size:14px}
-.focus-r{width:300px;flex:none;border-left:1px solid var(--line);padding-left:24px;overflow:auto}
+.focus-r{width:300px;flex:none;border-left:1px solid var(--line-c);padding-left:24px;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.f-h{margin:0;font-size:17px;font-weight:500}
+.sess{display:grid}
+.ses{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;font-size:15px;padding:8px 0;border-bottom:1px solid var(--line-c)}
+.ses .mono{font-size:calc(var(--text-size) * var(--mono-scale));color:var(--text-2)}
+.ses.early{opacity:.8}
+.f-none{font-size:14px;color:var(--text-3)}
+.f-sum{font-size:calc(var(--text-size) * var(--mono-scale));color:var(--text-2)}
+.pop .opts{display:grid;gap:2px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 18px}
-.stat{background:rgba(var(--grey),.03);border-radius:8px;padding:10px 12px}
-.stat .k{font-size:12px;color:var(--t3)}
+.stat{background:var(--surface);border:1px solid var(--line-c);border-radius:var(--radius-lg);padding:10px 12px}
+.stat .k{font-size:12.5px;color:var(--text-3)}
 .stat .v{font-size:22px;font-weight:600}
-.rec{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid var(--line);color:var(--t2)}
 
 /* ===== habits (Gate A): a surface card per habit, square hue cells, a dashed cell for today, a Martian count at the end ===== */
 .habit{display:flex;align-items:center;gap:14px;min-height:56px;padding:6px 8px 6px 14px;margin-bottom:6px;border-radius:var(--radius-lg);background:var(--surface);border:1px solid var(--line-c);transition:background var(--dur-1) var(--ease-out),border-color var(--dur-1) var(--ease-out)}
@@ -531,7 +543,6 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
   .detail{width:100%;bottom:calc(52px + var(--safe-b))}
   .focus{flex-direction:column;gap:20px}
   .focus-r{width:auto;border:0;padding:0}
-  .ring{width:220px;height:220px}
   .matrix{grid-template-columns:1fr;grid-template-rows:none;height:auto}
   .quad{min-height:200px}
   .week{gap:4px}
@@ -551,9 +562,8 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
 .touch-ghost{opacity:.92;box-shadow:0 8px 24px rgba(0,0,0,.25);border-radius:8px;background:rgb(var(--bg))}
 
 /* ===== Martian Mono for real data only (T3, T12): times, dates, counts, durations ===== */
-:is(.sec-h .n,.nav-item .cnt,.pop .mi .kbd,.cell .d,.tg-dh b,.tg-hours,.blk .bs,.ring .time,.stat .v,.rec > span:last-child,.wd button.part,.wd button.on,.habit .stk,.more){font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+:is(.mono,.f-phase,.f-clock,.sec-h .n,.nav-item .cnt,.pop .mi .kbd,.cell .d,.tg-dh b,.tg-hours,.blk .bs,.stat .v,.wd button.part,.wd button.on,.habit .stk,.more){font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 :is(.blk .bs,.tg-hours,.nav-item .cnt,.sec-h .n){font-size:calc(var(--text-size) * var(--mono-scale) - 1.5px);letter-spacing:-.01em}
-.ring .time{font-weight:400;letter-spacing:-.02em}
 .stat .v{font-weight:500}
 
 /* theme picker */

@@ -3,9 +3,10 @@ import type { Task } from './types';
 import { $, clone, uid } from './lib/util';
 import { TODAY, fmtDue, nextMonday, tomorrow } from './lib/dates';
 import { advanceRepeat } from './recurrence';
-import { S, canWrite, dueText, listName, ord, peopleOf, touch, ui } from './store';
+import { S, canWrite, dueText, listName, ord, peopleOf, prefs, touch, ui } from './store';
 import { menu } from './ui/popover';
 import { toast } from './ui/toast';
+import { playSound } from './ui/sounds';
 import { dismissReminder } from './views/reminders';
 import { focusOn } from './views/focus';
 import { render } from './app';
@@ -24,6 +25,7 @@ export function toggleDone(id: string, rowEl?: Element | null) {
   Object.assign(t, { done: !t.done, doneAt: !t.done ? Date.now() : null, snooze: null }); touch(t);
   dismissReminder(id);
   if (t.done) {
+    playSound('taskDone', prefs.sounds);
     animateOut(rowEl);
     toast('Completed', () => { touch(Object.assign(S.tasks[id]!, { done: false, doneAt: null })); render(); });
   } else render();
@@ -33,6 +35,7 @@ export function toggleDone(id: string, rowEl?: Element | null) {
 function completeRepeating(t: Task, rowEl?: Element | null) {
   const r = t.repeat!, before = clone(t);
   const { next, finished } = advanceRepeat(r, t.due!, TODAY());
+  playSound('taskDone', prefs.sounds);
   if (finished) { Object.assign(t, { done: true, doneAt: Date.now(), snooze: null }); touch(t); animateOut(rowEl); toast('Completed — last occurrence'); return; }
   const copy: Task = { ...clone(t), id: uid(), done: true, doneAt: Date.now(), repeat: null, reminders: [], snooze: null, repeatOf: t.id, created: Date.now(), order: Date.now() };
   touch(copy);

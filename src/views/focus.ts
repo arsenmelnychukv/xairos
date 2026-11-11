@@ -13,7 +13,8 @@ import { S, live, me, prefs, savePrefs, session, ui, upd } from '../store';
 import { I } from '../ui/icons';
 import { closePop, popover } from '../ui/popover';
 import { toast } from '../ui/toast';
-import { beep, openTask } from './reminders';
+import { openTask } from './reminders';
+import { playSound } from '../ui/sounds';
 import { go } from '../app';
 
 const settings = (): FocusSettings => ({ ...DEFAULT_FOCUS, ...(prefs.focus || {}) });
@@ -28,8 +29,8 @@ function timer(): Timer {
 function save(t: Timer) { T = t; lsSet(key(), t); }
 
 const fmtClock = (s: number) => { s = Math.max(0, Math.ceil(s)); return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`; };
-const R = 130, C = 2 * Math.PI * R;
-const PHASE_LABEL = { focus: 'Focus', short: 'Short break', long: 'Long break' } as const;
+const PHASE_LABEL = { focus: 'focus', short: 'short break', long: 'long break' } as const;
+const fmtMins = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h ` : '') + (m % 60 || m < 60 ? `${m % 60}m` : '').trim();
 
 function frac(t: Timer) {
   const secs = clockSecs(t);
@@ -53,14 +54,17 @@ export function renderFocus() {
   const recs = Object.values(S.focus).filter(f => !f.removed).sort((a, b) => a.start - b.start);
   const today = recs.filter(f => ymd(new Date(f.start)) === TODAY());
   const mins = today.reduce((a, f) => a + f.mins, 0), all = recs.reduce((a, f) => a + f.mins, 0);
-  const label = t.mode === 'sw' ? (running(t) ? 'Stopwatch' : started(t) ? 'Paused' : 'Stopwatch')
-    : running(t) ? (t.phase === 'focus' ? 'Focusing' : PHASE_LABEL[t.phase]) : started(t) ? 'Paused' : PHASE_LABEL[t.phase];
+  // "focus · 2 of 4": the phase and where it sits in the cycle (Gate A).
+  const base = t.mode === 'sw' ? 'stopwatch' : t.phase === 'focus' ? `focus · ${t.cycle + 1} of ${s.longEvery}` : t.phase === 'short' ? `short break · ${t.cycle} of ${s.longEvery}` : 'long break';
+  const label = base + (!running(t) && started(t) ? ' · paused' : '');
   const linked = t.taskId ? S.tasks[t.taskId] : undefined;
   const rec = (f: FocusRecord) => {
-    const d = new Date(f.start), e = new Date(f.start + f.mins * 6e4), task = f.taskId ? S.tasks[f.taskId] : undefined;
-    return `<div class="rec"><span>${fmtDue(ymd(d))} · ${pad(d.getHours())}:${pad(d.getMinutes())}–${pad(e.getHours())}:${pad(e.getMinutes())}<br>${task
-      ? `<button class="rec-task" data-open="${task.id}">${esc(task.title || f.task || 'Task')}</button>` : `<span class="rec-note">${esc(f.task || 'Focus')}</span>`}</span><span>${f.mins}m</span></div>`;
+    const d = new Date(f.start), task = f.taskId ? S.tasks[f.taskId] : undefined;
+    return `<div class="ses"><span class="mono">${pad(d.getHours())}:${pad(d.getMinutes())}</span><span class="ses-t">${task
+      ? `<button class="rec-task" data-open="${task.id}">${esc(task.title || f.task || 'Task')}</button>` : `<span class="rec-note">${esc(f.task || 'Focus')}</span>`}</span><span class="mono">${f.mins}m</span></div>`;
   };
+  const earlier = recs.filter(f => ymd(new Date(f.start)) !== TODAY()).reverse().slice(0, 10);
+  const recE = (f: FocusRecord) => rec(f).replace('<span class="mono">', `<span class="mono" title="${esc(fmtDue(ymd(new Date(f.start))))}">`).replace(/^<div class="ses">/, '<div class="ses early">');
   const dots = t.mode === 'pomo' ? `<div class="f-cycle" title="Sessions until the long break">${Array.from({ length: s.longEvery }, (_, i) => `<i class="${i < t.cycle ? 'on' : ''}"></i>`).join('')}</div>` : '';
   main.innerHTML = `
     <div class="topbar"><h1>Focus</h1>
@@ -69,31 +73,32 @@ export function renderFocus() {
     </div>
     <div class="content"><div class="focus">
       <div class="focus-l">
-        <div class="f-task">
+        <span class="f-phase mono">${label}</span>
+        <div class="f-clock mono" id="f-time" role="timer" aria-label="Time left">${fmtClock(clockSecs(t))}</div>
+        <div class="f-track ${t.phase !== 'focus' && t.mode === 'pomo' ? 'brk' : ''}" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(frac(t) * 100)}"><b id="f-bar" style="transform:scaleX(${frac(t)})"></b></div>
+        <div class="f-task ${linked ? 'linked' : ''}">
+          ${linked ? `<span class="cb ${linked.done ? 'on' : ''}" aria-hidden="true">${I.check}</span>${linked.priority ? `<span class="pm p${linked.priority}" aria-hidden="true"></span>` : ''}` : ''}
           <input id="f-task" placeholder="Focus on…" value="${esc(linked ? linked.title : t.task)}" ${linked ? 'readonly' : ''}>
+          ${linked && linked.dur ? `<span class="mono f-dur">${fmtMins(linked.dur)}</span>` : ''}
           ${linked ? `<button class="icon-btn" id="f-unlink" aria-label="Unlink task" title="Unlink task">${I.close}</button>` : `<button class="icon-btn" id="f-pick" aria-label="Pick a task" title="Pick a task">${I.tasks}</button>`}
-        </div>
-        <div class="ring ${t.phase !== 'focus' && t.mode === 'pomo' ? 'brk' : ''}">
-          <svg viewBox="0 0 280 280"><circle cx="140" cy="140" r="${R}" fill="none" stroke="rgba(var(--grey),.06)" stroke-width="8"/><circle id="f-arc" cx="140" cy="140" r="${R}" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac(t))}" style="transition:stroke-dashoffset .4s linear"/></svg>
-          <div class="time" id="f-time">${fmtClock(clockSecs(t))}</div>
-          <div class="lbl">${label}</div>
         </div>
         ${dots}
         <div class="f-btns">
-          ${running(t) ? `<button class="btn sec" id="f-pause">Pause</button>` : `<button class="btn pri" id="f-start">${started(t) ? 'Continue' : t.phase === 'focus' || t.mode === 'sw' ? 'Start' : 'Start break'}</button>`}
-          ${t.mode === 'pomo' && t.phase !== 'focus' ? `<button class="btn sec" id="f-skip">Skip break</button>` : started(t) ? `<button class="btn sec" id="f-stop">End</button>` : ''}
+          ${running(t) ? `<button class="btn pri" id="f-pause">Pause</button>` : `<button class="btn pri" id="f-start">${started(t) ? 'Continue' : t.phase === 'focus' || t.mode === 'sw' ? 'Start' : 'Start break'}</button>`}
+          ${t.mode === 'pomo' && t.phase !== 'focus' ? `<button class="btn sec" id="f-skip">Skip</button>` : started(t) ? `<button class="btn sec" id="f-stop">End</button>` : ''}
         </div>
       </div>
       <div class="focus-r">
-        <div class="sec-h" style="cursor:default">Overview</div>
+        <h4 class="f-h">Today</h4>
+        <div class="sess">${today.slice().reverse().map(rec).join('') || '<div class="f-none">No sessions yet</div>'}</div>
+        <span class="mono f-sum">${fmtMins(mins)} focused today</span>
         <div class="stats">
           <div class="stat"><div class="k">Today's Pomos</div><div class="v">${today.filter(f => f.mins >= s.focus * .8).length}</div></div>
-          <div class="stat"><div class="k">Today's Focus</div><div class="v">${Math.floor(mins / 60)}h ${mins % 60}m</div></div>
+          <div class="stat"><div class="k">Today's Focus</div><div class="v">${fmtMins(mins)}</div></div>
           <div class="stat"><div class="k">Total Pomos</div><div class="v">${recs.filter(f => f.mins >= s.focus * .8).length}</div></div>
-          <div class="stat"><div class="k">Total Focus</div><div class="v">${Math.floor(all / 60)}h ${all % 60}m</div></div>
+          <div class="stat"><div class="k">Total Focus</div><div class="v">${fmtMins(all)}</div></div>
         </div>
-        <div class="sec-h" style="cursor:default">Focus Record</div>
-        ${recs.slice().reverse().slice(0, 20).map(rec).join('') || '<div style="color:var(--t3);font-size:13px">No records yet</div>'}
+        ${earlier.length ? `<h4 class="f-h">Earlier</h4><div class="sess">${earlier.map(recE).join('')}</div>` : ''}
       </div>
     </div></div>`;
 
@@ -140,11 +145,16 @@ function settingsPop(anchor: Element) {
     <div class="fld"><span class="lab">Long break</span>${num('fs-l', s.long, 1, 90, 'min')}</div>
     <div class="fld"><span class="lab">Long break</span>${num('fs-e', s.longEvery, 2, 12, 'after this many')}</div>
     <div class="fld"><span class="lab"></span><label class="opt"><input type="checkbox" id="fs-a" ${s.autoStart ? 'checked' : ''}>Start breaks and the next focus by themselves</label></div>
+    <div class="fld"><span class="lab">Sounds</span><span class="opts">
+      <label class="opt"><input type="checkbox" id="fs-sf" ${prefs.sounds?.focusEnd ? 'checked' : ''}>Bell when focus ends</label>
+      <label class="opt"><input type="checkbox" id="fs-sb" ${prefs.sounds?.breakEnd ? 'checked' : ''}>Two tones when a break ends</label>
+      <label class="opt"><input type="checkbox" id="fs-st" ${prefs.sounds?.taskDone ? 'checked' : ''}>Tick when a task is completed</label></span></div>
     <div class="btns"><button class="btn sec" data-x>Cancel</button><button class="btn pri" data-ok>Save</button></div>`, 320);
   const n = (id: string, min: number, max: number, d: number) => Math.min(max, Math.max(min, Math.round(+$<HTMLInputElement>(id, p).value || d)));
   $('[data-x]', p).onclick = closePop;
   $('[data-ok]', p).onclick = () => {
     prefs.focus = { focus: n('#fs-f', 1, 180, 25), short: n('#fs-s', 1, 60, 5), long: n('#fs-l', 1, 90, 15), longEvery: n('#fs-e', 2, 12, 4), autoStart: $<HTMLInputElement>('#fs-a', p).checked };
+    prefs.sounds = { focusEnd: $<HTMLInputElement>('#fs-sf', p).checked, breakEnd: $<HTMLInputElement>('#fs-sb', p).checked, taskDone: $<HTMLInputElement>('#fs-st', p).checked };
     savePrefs(); closePop();
     // An idle timer takes the new length right away.
     const t = timer();
@@ -173,7 +183,7 @@ function endSession(manual: boolean) {
 /** A Pomo phase ran out: record focus, move to the break (or back to focus). */
 function phaseDone(t: Timer) {
   const s = settings();
-  beep();
+  playSound(t.phase === 'focus' ? 'focusEnd' : 'breakEnd', prefs.sounds);
   let next: Timer;
   if (t.phase === 'focus') {
     record(t, s.focus);
@@ -203,7 +213,7 @@ export function initFocus() {
     for (let i = 0; i < 20 && t.mode === 'pomo' && t.endAt && t.endAt <= Date.now(); i++) { phaseDone(t); t = timer(); }
     if (ui.route === 'focus') {
       const el = document.getElementById('f-time'); if (el) el.textContent = fmtClock(clockSecs(t));
-      const arc = document.getElementById('f-arc'); if (arc) arc.setAttribute('stroke-dashoffset', String(C * (1 - frac(t))));
+      const bar = document.getElementById('f-bar'); if (bar) bar.style.transform = `scaleX(${frac(t)})`;
     }
     document.title = running(t) ? `${fmtClock(clockSecs(t))} · ${t.phase === 'focus' || t.mode === 'sw' ? 'Focus' : 'Break'} · xairos` : 'xairos';
   }, 250);

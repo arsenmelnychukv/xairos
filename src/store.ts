@@ -52,6 +52,8 @@ export interface Prefs {
   boards?: Record<string, boolean>;
   /** Pomo lengths; see src/focus.ts. Per device. */
   focus?: import('./focus').FocusSettings;
+  /** Which sounds are on (all off by default); see src/ui/sounds.ts. Per device. */
+  sounds?: Partial<Record<'focusEnd' | 'breakEnd' | 'taskDone', boolean>>;
 }
 export const prefs: Prefs = Object.assign({ theme: 'system', kanban: false, closed: {}, sideClosed: {}, weekStart: 1, calView: 'month' }, lsGet('xairos.prefs') || {});
 export const savePrefs = () => lsSet('xairos.prefs', prefs);
