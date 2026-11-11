@@ -147,13 +147,14 @@ function settingsPop(anchor: Element) {
     <div class="fld"><span class="lab">Sounds</span><span class="opts">
       <label class="opt"><input type="checkbox" id="fs-sf" ${soundOn(prefs.sounds, 'focusEnd') ? 'checked' : ''}>Bell when focus ends</label>
       <label class="opt"><input type="checkbox" id="fs-sb" ${soundOn(prefs.sounds, 'breakEnd') ? 'checked' : ''}>Two tones when a break ends</label>
-      <label class="opt"><input type="checkbox" id="fs-st" ${soundOn(prefs.sounds, 'taskDone') ? 'checked' : ''}>Tick when a task is completed</label></span></div>
+      <label class="opt"><input type="checkbox" id="fs-st" ${soundOn(prefs.sounds, 'taskDone') ? 'checked' : ''}>Tick when a task is completed</label>
+      <label class="opt"><input type="checkbox" id="fs-sr" ${soundOn(prefs.sounds, 'reminder') ? 'checked' : ''}>Beep for reminders</label></span></div>
     <div class="btns"><button class="btn sec" data-x>Cancel</button><button class="btn pri" data-ok>Save</button></div>`, 320);
   const n = (id: string, min: number, max: number, d: number) => Math.min(max, Math.max(min, Math.round(+$<HTMLInputElement>(id, p).value || d)));
   $('[data-x]', p).onclick = closePop;
   $('[data-ok]', p).onclick = () => {
     prefs.focus = { focus: n('#fs-f', 1, 180, 25), short: n('#fs-s', 1, 60, 5), long: n('#fs-l', 1, 90, 15), longEvery: n('#fs-e', 2, 12, 4), autoStart: $<HTMLInputElement>('#fs-a', p).checked };
-    prefs.sounds = { focusEnd: $<HTMLInputElement>('#fs-sf', p).checked, breakEnd: $<HTMLInputElement>('#fs-sb', p).checked, taskDone: $<HTMLInputElement>('#fs-st', p).checked };
+    prefs.sounds = { focusEnd: $<HTMLInputElement>('#fs-sf', p).checked, breakEnd: $<HTMLInputElement>('#fs-sb', p).checked, taskDone: $<HTMLInputElement>('#fs-st', p).checked, reminder: $<HTMLInputElement>('#fs-sr', p).checked };
     savePrefs(); closePop();
     // An idle timer takes the new length right away.
     const t = timer();

@@ -1,5 +1,5 @@
 /**
- * In-tab reminders: system notification, beep and an in-app card. Fire only
+ * In-tab reminders: system notification, a beep (a sound setting) and an in-app card. Fire only
  * while a tab is open. With background reminders on (src/push.ts) the server
  * sends the system notification, so this tab only beeps and shows the card.
  */
@@ -13,6 +13,7 @@ import { S, dueText, hasDb, prefs, inboxId, listName, live, me, session, touch }
 import { I } from '../ui/icons';
 import { menu } from '../ui/popover';
 import { toast } from '../ui/toast';
+import { playSound } from '../ui/sounds';
 import { guard, select, toggleDone } from '../actions';
 import { go, render } from '../app';
 import { closeTaskNotification, pushActive } from '../push';
@@ -52,18 +53,8 @@ export function askNotify(explicit: boolean) {
   else if (explicit) toast(Notification.permission === 'granted' ? 'Notifications are on' : 'Notifications are blocked in browser settings');
 }
 
-export function beep() {
-  try {
-    const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    const ctx = new AC(); const o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = 'sine'; o.frequency.value = 880;
-    g.gain.setValueAtTime(.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.15, ctx.currentTime + .02); g.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .5);
-    o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + .55);
-  } catch { /* no audio */ }
-}
-
 function notifyTask(t: Task) {
-  beep();
+  playSound('reminder', prefs.sounds);
   if ('Notification' in window && Notification.permission === 'granted' && !pushActive()) {
     try {
       const n = new Notification(t.title || 'Reminder', { body: dueText(t) || 'Reminder', tag: t.id });
@@ -88,7 +79,7 @@ function notifyTask(t: Task) {
 }
 
 function notifyHabit(hb: Habit) {
-  beep();
+  playSound('reminder', prefs.sounds);
   const g = goalOf(hb), n = countOn(hb, TODAY());
   const body = g > 1 ? `${n}/${g}${hb.unit ? ' ' + hb.unit : ''} today` : 'Not done yet today';
   if ('Notification' in window && Notification.permission === 'granted' && !pushActive()) {

@@ -8,6 +8,14 @@ describe('sounds', () => {
     expect(soundOn({ focusEnd: true }, 'focusEnd')).toBe(true);
     expect(soundOn({ focusEnd: false }, 'focusEnd')).toBe(false);
   });
+  it('the reminder beep is on unless it is explicitly turned off', () => {
+    expect(soundOn(undefined, 'reminder')).toBe(true);
+    expect(soundOn({}, 'reminder')).toBe(true);
+    expect(soundOn({ reminder: false }, 'reminder')).toBe(false);
+  });
+  it('the reminder beep keeps the original 880 Hz sine', () => {
+    expect(PLANS.reminder.map(n => [n.type, n.hz, n.dur])).toEqual([['sine', 880, .5]]);
+  });
   it('the two-tone and the tick are off unless turned on', () => {
     for (const n of ['breakEnd', 'taskDone'] as const) {
       expect(soundOn(undefined, n)).toBe(false);

@@ -1,25 +1,27 @@
 /**
- * Sounds (M7, M12): synthesised with Web Audio, each with its own setting; only the focus-end bell is on by default.
+ * Sounds (M7, M12): synthesised with Web Audio, each with its own setting; the focus-end bell and the reminder beep are on by default.
  * They play only after the user has touched the page, so a browser never blocks or surprises.
  */
-export type SoundName = 'focusEnd' | 'breakEnd' | 'taskDone';
+export type SoundName = 'focusEnd' | 'breakEnd' | 'taskDone' | 'reminder';
 export type SoundPrefs = Partial<Record<SoundName, boolean>>;
 
 /** One note: oscillator type, Hz, start (s), length (s), peak gain. */
 export interface Note { type: OscillatorType; hz: number; at: number; dur: number; gain: number }
 
 /** What each sound is made of. The tick is a noise click, so it has no notes. */
-export const PLANS: Record<'focusEnd' | 'breakEnd', Note[]> = {
+export const PLANS: Record<Exclude<SoundName, 'taskDone'>, Note[]> = {
   // Bell: 880 + 1320 Hz sine, 1.4 s decay.
   focusEnd: [{ type: 'sine', hz: 880, at: 0, dur: 1.4, gain: .14 }, { type: 'sine', hz: 1320, at: 0, dur: 1.4, gain: .07 }],
   // Two-tone: 660 then 990 Hz triangle.
   breakEnd: [{ type: 'triangle', hz: 660, at: 0, dur: .22, gain: .14 }, { type: 'triangle', hz: 990, at: .2, dur: .3, gain: .14 }],
+  // Reminder beep: the app's original 880 Hz sine, 0.5 s.
+  reminder: [{ type: 'sine', hz: 880, at: 0, dur: .5, gain: .15 }],
 };
 /** The tick: 30 ms of noise through a band-pass filter. */
 export const TICK = { ms: 30, hz: 2400, q: 1.2, gain: .25 };
 
-/** Sounds that are on until the user turns them off (M13): the focus-end bell. The rest are off until turned on. */
-export const ON_BY_DEFAULT: Record<SoundName, boolean> = { focusEnd: true, breakEnd: false, taskDone: false };
+/** Sounds that are on until the user turns them off (M13, M14): the focus-end bell and the reminder beep. The rest are off until turned on. */
+export const ON_BY_DEFAULT: Record<SoundName, boolean> = { focusEnd: true, breakEnd: false, taskDone: false, reminder: true };
 
 /** Is this sound switched on? An unset setting takes the default; only an explicit value overrides it. */
 export const soundOn = (p: SoundPrefs | undefined, name: SoundName) => p?.[name] ?? ON_BY_DEFAULT[name];
