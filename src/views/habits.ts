@@ -58,9 +58,24 @@ function stk(hb: Habit): { txt: string; label: string } {
 
 /** A 7, 30 or 100 day streak just reached: the log line plays once, as the one slow moment (M5). */
 const MILESTONES = [7, 30, 100];
-let mile: { id: string; n: number; at: number } | null = null;
-export const milestoneHtml = (hb: Habit) => mile && mile.id === hb.id && Date.now() - mile.at < 4000
-  ? `<span class="logl" role="status"><i class="dot" aria-hidden="true"></i>${mile.n}-day streak · ${esc(hb.name)}</span>` : '';
+let mile: { id: string; n: number; played: boolean } | null = null, mileTimer: ReturnType<typeof setTimeout> | undefined;
+/** Milestones already shown, per habit, day and length: unchecking and rechecking does not fire again. */
+const shown = new Set<string>();
+/** The line animates on the first render only; later renders draw it still. It goes away after 4 s. */
+export const milestoneHtml = (hb: Habit) => {
+  if (!mile || mile.id !== hb.id) return '';
+  const cls = mile.played ? 'logl static' : 'logl';
+  mile.played = true;
+  return `<span class="${cls}" role="status"><i class="dot" aria-hidden="true"></i>${mile.n}-day streak · ${esc(hb.name)}</span>`;
+};
+function fireMilestone(id: string, n: number) {
+  const key = `${id}|${TODAY()}|${n}`;
+  if (shown.has(key)) return;
+  shown.add(key);
+  mile = { id, n, played: false };
+  clearTimeout(mileTimer);
+  mileTimer = setTimeout(() => { mile = null; render(); }, 4000);
+}
 
 function dayBtn(hb: Habit, k: string) {
   const d = new Date(k + 'T00:00'), n = countOn(hb, k), g = goalOf(hb), done = n >= g, future = k > TODAY();
@@ -105,7 +120,7 @@ export function bindDays(root: HTMLElement, after: () => void) {
       const hb = S.habits[b.dataset.h!], was = hb && streak(hb, TODAY(), prefs.weekStart);
       tapHabit(b.dataset.h!, b.dataset.d!);
       const now = S.habits[b.dataset.h!], is = now && streak(now, TODAY(), prefs.weekStart);
-      if (was && is && is.unit === 'day' && is.n > was.n && MILESTONES.includes(is.n)) mile = { id: now!.id, n: is.n, at: Date.now() };
+      if (was && is && is.unit === 'day' && is.n > was.n && MILESTONES.includes(is.n)) fireMilestone(now!.id, is.n);
       after();
     };
     b.oncontextmenu = e => { e.preventDefault(); dayMenu(b, b.dataset.h!, b.dataset.d!, after); };

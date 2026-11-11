@@ -447,6 +447,7 @@ svg{display:block}
 .logl{display:inline-flex;align-items:center;gap:8px;justify-self:start;font-family:var(--font-mono);font-size:calc(var(--text-size) * var(--mono-scale) - 1px);color:var(--text);padding:4px 12px;margin:0 0 8px;border:1px solid color-mix(in oklab,var(--hc) 40%,transparent);border-radius:var(--radius-pill);background:color-mix(in oklab,var(--hc) 10%,var(--ground));animation:milestone var(--dur-4) var(--ease-out) both}
 .logl .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:milestone-dot var(--dur-4) var(--ease-out) both}
 @keyframes milestone{from{opacity:0;transform:translateY(8px)}}
+.logl.static,.logl.static .dot{animation:none}
 @keyframes milestone-dot{0%,45%{opacity:0;transform:scale(0)}}
 @media (prefers-reduced-motion:reduce){@keyframes milestone{from{opacity:0}}@keyframes milestone-dot{from{opacity:0}}}
 

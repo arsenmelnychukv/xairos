@@ -77,3 +77,13 @@ export function nextPhase(t: Timer, s: FocusSettings, finishedFocus: boolean): T
   }
   return { ...t, phase: 'focus', endAt: null, left: phaseSecs('focus', s), startedAt: null };
 }
+
+/** Minutes as "45m", "1h" or "1h 30m". */
+export const fmtMins = (m: number): string => {
+  const h = Math.floor(m / 60), r = m % 60;
+  return [h ? `${h}h` : '', r || !h ? `${r}m` : ''].filter(Boolean).join(' ');
+};
+
+/** A phase end only chimes when it just happened, so waking an old tab does not replay the past. */
+export const CHIME_WINDOW_MS = 10_000;
+export const shouldChime = (endAt: number | null, now: number): boolean => endAt !== null && now - endAt <= CHIME_WINDOW_MS;

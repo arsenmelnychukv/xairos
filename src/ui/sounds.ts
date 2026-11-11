@@ -21,20 +21,36 @@ export const TICK = { ms: 30, hz: 2400, q: 1.2, gain: .25 };
 /** Is this sound switched on? Off unless the setting is true. */
 export const soundOn = (p: SoundPrefs | undefined, name: SoundName) => p?.[name] === true;
 
-let ctx: AudioContext | null = null, touched = false;
-if (typeof window !== 'undefined') {
-  const mark = () => { touched = true; };
-  for (const ev of ['pointerdown', 'keydown', 'touchstart']) window.addEventListener(ev, mark, { once: true, capture: true, passive: true });
-}
+let ctx: AudioContext | null = null, unlocked = false;
+const GESTURES = ['pointerdown', 'touchstart', 'touchend', 'click', 'keydown'];
 
-function audio(): AudioContext | null {
-  if (!touched) return null;
+/**
+ * iOS keeps an AudioContext suspended unless it is made and resumed inside a user gesture. So the first
+ * gesture creates it, resumes it and plays one silent sample; later sounds (from timers) reuse it.
+ */
+function unlock() {
   try {
     const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     ctx = ctx || new AC();
-    if (ctx.state === 'suspended') void ctx.resume();
-    return ctx;
-  } catch { return null; }
+    const c = ctx;
+    void c.resume().then(() => { if (c.state === 'running') done(); }).catch(() => { /* try again on the next gesture */ });
+    const src = c.createBufferSource();
+    src.buffer = c.createBuffer(1, 1, c.sampleRate);
+    src.connect(c.destination); src.start();
+    if (c.state === 'running') done();
+  } catch { /* no audio */ }
+}
+function done() {
+  unlocked = true;
+  for (const ev of GESTURES) window.removeEventListener(ev, unlock, true);
+}
+if (typeof window !== 'undefined') for (const ev of GESTURES) window.addEventListener(ev, unlock, { capture: true, passive: true });
+
+/** The unlocked context, or null before the user has touched the page. */
+function audio(): AudioContext | null {
+  if (!unlocked || !ctx) return null;
+  if (ctx.state === 'suspended') void ctx.resume();
+  return ctx;
 }
 
 function tone(c: AudioContext, n: Note) {

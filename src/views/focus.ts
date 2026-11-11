@@ -7,14 +7,14 @@ import type { FocusRecord } from '../types';
 import { $, esc, lsGet, lsSet, uid } from '../lib/util';
 import { TODAY, fmtDue, pad, ymd } from '../lib/dates';
 import {
-  DEFAULT_FOCUS, type FocusSettings, type Timer, clockSecs, focusedMins, idleTimer, nextPhase, pause, phaseSecs, running, start,
+  DEFAULT_FOCUS, type FocusSettings, type Timer, clockSecs, fmtMins, focusedMins, idleTimer, nextPhase, pause, phaseSecs, running, shouldChime, start,
 } from '../focus';
 import { S, live, me, prefs, savePrefs, session, ui, upd } from '../store';
 import { I } from '../ui/icons';
 import { closePop, popover } from '../ui/popover';
 import { toast } from '../ui/toast';
 import { openTask } from './reminders';
-import { playSound } from '../ui/sounds';
+import { playSound, type SoundName } from '../ui/sounds';
 import { go } from '../app';
 
 const settings = (): FocusSettings => ({ ...DEFAULT_FOCUS, ...(prefs.focus || {}) });
@@ -30,7 +30,6 @@ function save(t: Timer) { T = t; lsSet(key(), t); }
 
 const fmtClock = (s: number) => { s = Math.max(0, Math.ceil(s)); return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`; };
 const PHASE_LABEL = { focus: 'focus', short: 'short break', long: 'long break' } as const;
-const fmtMins = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h ` : '') + (m % 60 || m < 60 ? `${m % 60}m` : '').trim();
 
 function frac(t: Timer) {
   const secs = clockSecs(t);
@@ -55,7 +54,7 @@ export function renderFocus() {
   const today = recs.filter(f => ymd(new Date(f.start)) === TODAY());
   const mins = today.reduce((a, f) => a + f.mins, 0), all = recs.reduce((a, f) => a + f.mins, 0);
   // "focus · 2 of 4": the phase and where it sits in the cycle (Gate A).
-  const base = t.mode === 'sw' ? 'stopwatch' : t.phase === 'focus' ? `focus · ${t.cycle + 1} of ${s.longEvery}` : t.phase === 'short' ? `short break · ${t.cycle} of ${s.longEvery}` : 'long break';
+  const base = t.mode === 'sw' ? 'stopwatch' : t.phase === 'focus' ? `focus · ${t.cycle + 1} of ${s.longEvery}` : t.phase === 'short' ? `short break${t.cycle > 0 ? ` · ${t.cycle} of ${s.longEvery}` : ''}` : 'long break';
   const label = base + (!running(t) && started(t) ? ' · paused' : '');
   const linked = t.taskId ? S.tasks[t.taskId] : undefined;
   const rec = (f: FocusRecord) => {
@@ -181,9 +180,9 @@ function endSession(manual: boolean) {
 }
 
 /** A Pomo phase ran out: record focus, move to the break (or back to focus). */
-function phaseDone(t: Timer) {
+function phaseDone(t: Timer): SoundName {
   const s = settings();
-  playSound(t.phase === 'focus' ? 'focusEnd' : 'breakEnd', prefs.sounds);
+  const sound: SoundName = t.phase === 'focus' ? 'focusEnd' : 'breakEnd';
   let next: Timer;
   if (t.phase === 'focus') {
     record(t, s.focus);
@@ -197,6 +196,7 @@ function phaseDone(t: Timer) {
   if (s.autoStart) next = start(next, Math.min(Date.now(), t.endAt || Date.now()));
   save(next);
   if (ui.route === 'focus') renderFocus();
+  return sound;
 }
 
 function notify(title: string, body: string) {
@@ -209,8 +209,10 @@ export function initFocus() {
   setInterval(() => {
     if (!session) return;
     let t = timer();
-    // Several phases may have passed while the tab was closed (with auto-start on).
-    for (let i = 0; i < 20 && t.mode === 'pomo' && t.endAt && t.endAt <= Date.now(); i++) { phaseDone(t); t = timer(); }
+    // Several phases may have passed: one sound at most, and only if the last one ended just now.
+    let last: { sound: SoundName; endAt: number | null } | null = null;
+    for (let i = 0; i < 20 && t.mode === 'pomo' && t.endAt && t.endAt <= Date.now(); i++) { const endAt = t.endAt; last = { sound: phaseDone(t), endAt }; t = timer(); }
+    if (last && shouldChime(last.endAt, Date.now())) playSound(last.sound, prefs.sounds);
     if (ui.route === 'focus') {
       const el = document.getElementById('f-time'); if (el) el.textContent = fmtClock(clockSecs(t));
       const bar = document.getElementById('f-bar'); if (bar) bar.style.transform = `scaleX(${frac(t)})`;
