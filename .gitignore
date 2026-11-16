@@ -16,3 +16,6 @@ release/
 # Local notes and agent config, never published
 dev-notes/
 .claude/
+
+# Local design-tool output, not published
+.impeccable/design.json

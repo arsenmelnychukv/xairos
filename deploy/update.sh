@@ -5,7 +5,8 @@
 #   sudo /opt/xairos/current/deploy/update.sh /tmp/xairos-<version>.tar.gz
 #   sudo /opt/xairos/current/deploy/update.sh --rollback
 #
-# Before switching it takes a backup to the local repository. After switching it waits
+# Before switching it takes a backup to the local repository and aborts if that fails
+# (XAIROS_SKIP_BACKUP=1 skips it). After switching it waits
 # for PocketBase to answer; if it does not, it switches back and restarts the old one.
 # Note: PocketBase applies new database migrations on start, and a rollback does not undo
 # them. Restore the pre-update backup if an old release cannot read the new schema.
@@ -78,7 +79,7 @@ prev=""
 [[ -L "$OPT/current" ]] && prev="$(basename "$(readlink "$OPT/current")")"
 if [[ -n "$prev" && "${XAIROS_SKIP_BACKUP:-0}" != 1 ]]; then
   echo "backup before update"
-  run systemctl start xairos-backup.service || echo "warning: the pre-update backup failed (journalctl -u xairos-backup); continuing"
+  run systemctl start xairos-backup.service || die "the pre-update backup failed (journalctl -u xairos-backup); nothing was switched. Fix it, or set XAIROS_SKIP_BACKUP=1 to update without one"
 fi
 
 switch_to "$ver"
