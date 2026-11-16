@@ -24,6 +24,12 @@ Sign-up is closed: `/api/xairos/signup` only works while there are no accounts, 
 
 **Self-hosting** on any Debian or Ubuntu server, VM or container, on a private network or a public domain (Caddy for HTTPS, systemd services, restic backups): [docs/deploy.md](docs/deploy.md). In short: `scripts/release.sh`, `deploy/install.sh` once on the server, then `scripts/deploy.sh root@<host>` for updates.
 
+## Run it locally
+
+- **Mock:** `npm run dev:local`, then sign in with `admin@xairos.local` / `12345678`. This demo account exists only in dev builds of the mock server.
+- **PocketBase:** `npm run pb` and `npm run dev`, then `npm run dev:user` creates the same login, `admin@xairos.local` / `12345678` (it passes `--dev-machine`, and the script refuses to run without that flag). `XAIROS_DEV_PASSWORD` sets another password (8 or more characters). If the database already has accounts, start PocketBase with `XAIROS_OPEN_SIGNUP=1 npm run pb`. The script only talks to `127.0.0.1` or `localhost`, and refuses `NODE_ENV=production`.
+- **Dev machine only:** never run `npm run dev:user`, or pass `--dev-machine`, on a server install. There PocketBase also listens on `127.0.0.1` behind the proxy, and on an empty database the script would create an account with a public password.
+
 ## Server
 
 PocketBase 0.40.6 with JavaScript hooks. The app never touches PocketBase collections directly; it calls the §3 contract in `ROADMAP.md`:

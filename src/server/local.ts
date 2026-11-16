@@ -57,6 +57,11 @@ function habitStep(goal: number, n: number, action: string): number {
 const ymdOk = (s: unknown) => /^\d{4}-\d{2}-\d{2}$/.test(String(s ?? ''));
 const localToday = () => { const d = new Date(), z = (n: number) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
 
+/** Dev-only demo account for the mock backend. Read DEV on every call; a build drops the strings. */
+export function demoUser(): { email: string; password: string } | null {
+  return import.meta.env.DEV ? { email: 'admin@xairos.local', password: '12345678' } : null;
+}
+
 export interface HabitCheckResult { id: string; name: string; day: string; count: number; goal: number; done: boolean; message: string }
 
 export class LocalServer implements ServerAdapter {
@@ -80,8 +85,21 @@ export class LocalServer implements ServerAdapter {
   private people(l: List | undefined): string[] { return l ? [l.ownerId, ...Object.keys(l.members || {})] : []; }
   private notify(users: Iterable<string>) { this.chan?.postMessage({ type: 'needSync', users: [...users], origin: CLIENT_ID }); }
 
+  /** Create the dev demo user if missing. Skips the sign-up checks on purpose; no-op outside DEV. */
+  private async seedDemo() {
+    const demo = demoUser();
+    if (!demo || Object.values(this.db().users).some(u => u.email === demo.email)) return;
+    const salt = randHex(16), hash = await pbkdf2(demo.password, salt);
+    const d = this.db();
+    if (Object.values(d.users).some(u => u.email === demo.email)) return;
+    const id = uid(), now = Date.now(), inbox = 'inbox-' + id;
+    d.users[id] = { id, name: 'Demo', email: demo.email, salt, hash, created: now };
+    d.lists[inbox] = { id: inbox, name: 'Inbox', color: '120,120,130', ownerId: id, members: {}, inbox: true, order: 0, mtime: now, seq: ++d.seq };
+    this.save(d);
+  }
+
   async signup({ name, email, password }: { name: string; email: string; password: string }): Promise<Session> {
-    await this.lat();
+    await this.lat(); await this.seedDemo();
     email = String(email || '').trim().toLowerCase(); name = String(name || '').trim();
     if (!name) throw apiErr(400, 'Please enter your name.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw apiErr(400, 'Please enter a valid email.');
@@ -99,7 +117,7 @@ export class LocalServer implements ServerAdapter {
   }
 
   async login({ email, password }: { email: string; password: string }): Promise<Session> {
-    await this.lat();
+    await this.lat(); await this.seedDemo();
     email = String(email || '').trim().toLowerCase();
     const u = Object.values(this.db().users).find(x => x.email === email);
     const hash = u ? await pbkdf2(password, u.salt) : await pbkdf2(password, randHex(16));

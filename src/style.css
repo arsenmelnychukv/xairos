@@ -28,7 +28,7 @@ svg{display:block}
 .rail-btn svg{width:22px;height:22px}
 .rail .grow{flex:1}
 .tip{position:absolute;left:48px;top:50%;transform:translateY(-50%);background:var(--text);color:var(--ground);font-size:12.5px;padding:3px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--dur-1);z-index:50}
-.rail-btn:hover .tip{opacity:1;transition-delay:.4s}
+.rail-btn:hover .tip{opacity:1;transition-delay:var(--dur-3)}
 .sync svg{width:20px;height:20px}
 .sync.syncing svg{animation:spin 1s linear infinite;color:var(--accent)}
 .sync.err{color:var(--danger-c)}
@@ -49,8 +49,10 @@ svg{display:block}
 .nav-item.on{background:color-mix(in oklab,var(--accent) 13%,transparent);color:var(--text)}
 .nav-item .ico{width:18px;height:18px;color:var(--text-3);flex:none}
 .nav-item.on .ico{color:var(--accent)}
+.nav-item.on .ico text{fill:color-mix(in oklab,var(--accent) 80%,var(--text))}
 .nav-item .name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nav-item .cnt{font-size:12px;color:var(--text-3)}
+.nav-item.on .cnt{color:var(--text-2)}
 .nav-item .shared{width:14px;height:14px;color:var(--text-3)}
 .dot{width:9px;height:9px;border-radius:50%;flex:none;margin:0 4.5px}
 .side-sep{height:1px;background:var(--line-c);margin:8px 10px}
@@ -60,17 +62,18 @@ svg{display:block}
 .side-head button:hover{background:color-mix(in oklab,var(--text) 6%,transparent);color:var(--text-2)}
 .side-head button svg{width:14px;height:14px}
 .side-head .caret{display:flex;align-items:center;gap:4px;cursor:pointer}
-.side-head .caret svg{width:12px;height:12px;transition:transform .15s}
+.side-head .caret svg{width:12px;height:12px;transition:transform var(--dur-1) var(--ease-out)}
 .side-head.closed .caret svg{transform:rotate(-90deg)}
+@media (prefers-reduced-motion:reduce){.side-head .caret svg{transition:none}}
 
 /* ===== main column ===== */
 .main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--ground)}
 .topbar{height:56px;flex:none;display:flex;align-items:center;gap:8px;padding:0 20px 0 24px}
 .topbar h1{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:8px}
-.topbar h1 .badge{font-size:11px;font-weight:500;color:var(--t3);border:1px solid var(--line);border-radius:10px;padding:1px 8px}
-.icon-btn{width:30px;height:30px;border-radius:6px;display:grid;place-items:center;color:var(--t3);flex:none}
-.icon-btn:hover{background:rgba(var(--hover),.05);color:var(--t2)}
-.icon-btn.on{color:rgb(var(--primary))}
+.topbar h1 .badge{font-size:11px;font-weight:500;color:var(--text-3);border:1px solid var(--line);border-radius:10px;padding:1px 8px}
+.icon-btn{width:30px;height:30px;border-radius:6px;display:grid;place-items:center;color:var(--text-3);flex:none}
+.icon-btn:hover{background:color-mix(in oklab,var(--text) 5%,transparent);color:var(--text-2)}
+.icon-btn.on{color:var(--accent)}
 .icon-btn svg{width:18px;height:18px}
 .menu-toggle{display:none}
 .content{flex:1;overflow:auto;padding:0 24px 40px}
@@ -80,7 +83,7 @@ svg{display:block}
 .qa:focus-within{border-color:var(--accent-line)}
 .qa svg.plus{width:16px;height:16px;color:var(--text-3);flex:none}
 .qa input{flex:1;border:0;outline:0;background:none;height:100%;min-width:0}
-.qa input::placeholder{color:var(--t3)}
+.qa input::placeholder{color:var(--text-3)}
 .chips{display:flex;gap:4px;flex-wrap:nowrap;overflow:hidden}
 .chip{font-size:12.5px;padding:1px 9px;border-radius:var(--radius-pill);background:color-mix(in oklab,var(--accent) 13%,transparent);color:var(--text);white-space:nowrap}
 .chip.pri-5{background:color-mix(in oklab,var(--prio-high) 14%,transparent);color:var(--prio-high)}
@@ -91,6 +94,7 @@ svg{display:block}
 .sec-h{display:flex;align-items:center;gap:6px;height:30px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;user-select:none}
 .sec-h svg{width:12px;height:12px;color:var(--text-3);transition:transform var(--dur-2) var(--ease-out)}
 .sec.closed .sec-h svg{transform:rotate(-90deg)}
+@media (prefers-reduced-motion:reduce){.sec-h svg{transition:none}}
 .sec.closed .rows{display:none}
 .sec-h .n{color:var(--text-3);font-weight:400}
 .sec[data-sec="over"] > .sec-h{color:var(--danger-c)}
@@ -101,7 +105,7 @@ svg{display:block}
 .row.sel{background:color-mix(in oklab,var(--accent) 9%,var(--surface));border-color:var(--accent-line)}
 .row .title{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:6px 0;background:linear-gradient(currentColor,currentColor) no-repeat 0 55%/0 1.5px}
 .row .meta{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-3);flex:none}
-.row .meta .late{color:var(--danger-c)}
+.row .meta .late{color:var(--danger-text)}
 .row .meta .soon{color:var(--text);font-weight:500}
 .row .meta .tag{font-size:12.5px;padding:1px 9px;border-radius:var(--radius-pill);border:1px solid var(--line-c);color:var(--text-2)}
 .row .meta .sub{display:flex;align-items:center;gap:2px}
@@ -149,17 +153,17 @@ svg{display:block}
 
 /* kanban */
 .kanban{display:flex;gap:14px;align-items:flex-start;overflow-x:auto;padding-bottom:12px}
-.kcol{width:270px;flex:none;background:rgba(var(--grey),.025);border-radius:10px;padding:8px;min-height:80px}
+.kcol{width:270px;flex:none;background:color-mix(in oklab,var(--text) 2.5%,transparent);border-radius:10px;padding:8px;min-height:80px}
 .kcol .sec-h{padding:0 6px}
 .kcol .row{margin-bottom:6px}
 .kcol .sec-h{display:flex;align-items:center;gap:6px}
 .kc-menu{margin-left:auto;width:24px;height:24px;opacity:0}
 .kcol:hover .kc-menu,.kc-menu:focus-visible{opacity:1}
 @media (hover:none){.kc-menu{opacity:1}}
-.kc-add,.kc-new{display:flex;align-items:center;gap:6px;width:100%;border:0;background:none;font:inherit;font-size:13px;color:var(--t3);padding:6px;border-radius:6px;cursor:pointer}
+.kc-add,.kc-new{display:flex;align-items:center;gap:6px;width:100%;border:0;background:none;font:inherit;font-size:13px;color:var(--text-3);padding:6px;border-radius:6px;cursor:pointer}
 .kc-add svg,.kc-new svg{width:14px;height:14px}
-.kc-add:hover,.kc-new:hover{background:rgba(var(--hover),.05);color:var(--t2)}
-.kc-new{width:200px;flex:none;border:1px dashed var(--t4);justify-content:center;padding:10px}
+.kc-add:hover,.kc-new:hover{background:color-mix(in oklab,var(--text) 5%,transparent);color:var(--text-2)}
+.kc-new{width:200px;flex:none;border:1px dashed color-mix(in oklab,var(--text) 24%,transparent);justify-content:center;padding:10px}
 .kcol.done-col{opacity:.75}
 
 /* ===== detail pane (Gate A): a 19px title, property rows, subtasks, notes, a Martian "created" ===== */
@@ -216,7 +220,7 @@ svg{display:block}
 .pop .mi:hover{background:color-mix(in oklab,var(--accent) 13%,transparent)}
 .pop .mi svg{width:16px;height:16px}
 .pop .mi .kbd{margin-left:auto;font-size:12px;color:var(--text-3)}
-.pop .mi.danger{color:var(--danger-c)}
+.pop .mi.danger{color:var(--danger-text)}
 .pop .sep{height:1px;background:var(--line-c);margin:4px 6px}
 .pop .row-q{display:flex;justify-content:space-between;padding:6px 6px 10px;gap:4px}
 .pop .row-q button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--text-3);padding:6px 0;border-radius:var(--radius-sm)}
@@ -241,16 +245,16 @@ svg{display:block}
 .btn.sec:hover{background:color-mix(in oklab,var(--text) 6%,transparent)}
 .pop h4{margin:4px 8px 8px;font-size:14px;font-weight:600}
 .pop .note{font-size:12.5px;color:var(--text-3);margin:6px 8px}
-.pop .err{font-size:12.5px;color:var(--danger-c);margin:6px 8px}
+.pop .err{font-size:12.5px;color:var(--danger-text);margin:6px 8px}
 .pop .dlg-input{width:calc(100% - 16px);margin:0 8px;border:1px solid var(--line-c);border-radius:var(--radius-sm);padding:8px;background:var(--ground);outline:0;transition:border-color var(--dur-1) var(--ease-out)}
 .pop .dlg-input:focus{border-color:var(--accent-line)}
 .swatches{display:flex;gap:8px;padding:10px 8px 2px}
 .swatches button{width:20px;height:20px;border-radius:50%;box-shadow:0 0 0 2px transparent}
-.swatches button.on{box-shadow:0 0 0 2px rgb(var(--pop)),0 0 0 4px currentColor}
+.swatches button.on{box-shadow:0 0 0 2px var(--raised),0 0 0 4px currentColor}
 .acct{display:flex;align-items:center;gap:10px;padding:8px 10px 10px}
 .acct .avatar{width:36px;height:36px;font-size:14px}
 .acct .n{font-weight:600}
-.acct .e{font-size:12px;color:var(--t3)}
+.acct .e{font-size:12px;color:var(--text-3)}
 .member{display:flex;align-items:center;gap:10px;padding:6px 8px}
 .member .who{flex:1;min-width:0}
 .member .who div:last-child{font-size:12.5px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis}
@@ -261,9 +265,11 @@ svg{display:block}
 .member .role{font-size:12.5px;color:var(--text-3)}
 .invite .btn{flex:none}
 
-.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);opacity:0;background:var(--text);color:var(--ground);box-shadow:var(--shadow-pop);border-radius:8px;padding:10px 14px;display:flex;gap:16px;align-items:center;font-size:14px;transition:opacity var(--dur-2) var(--ease-out),transform var(--dur-2) var(--ease-out);z-index:200;pointer-events:none}
-.toast.on{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);opacity:0;background:var(--text);color:var(--ground);box-shadow:var(--shadow-pop);border-radius:8px;padding:10px 14px;display:flex;gap:16px;align-items:center;font-size:14px;transition:opacity var(--dur-1) var(--ease-exit),transform var(--dur-1) var(--ease-exit);z-index:200;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%);pointer-events:auto;transition:opacity var(--dur-2) var(--ease-out),transform var(--dur-2) var(--ease-out)}
+@media (prefers-reduced-motion:reduce){.toast,.toast.on{transform:translateX(-50%);transition:opacity var(--dur-2) var(--ease-out)}.toast:not(.on){transition-duration:var(--dur-1);transition-timing-function:var(--ease-exit)}}
 .toast button{color:color-mix(in oklab,var(--accent) 70%,var(--ground));font-weight:600}
+:root[data-mode="dark"] .toast button{color:color-mix(in oklab,var(--accent) 50%,var(--ground))}
 
 /* reminder cards */
 .rem-stack{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:150;width:320px;max-width:calc(100vw - 40px)}
@@ -277,12 +283,12 @@ svg{display:block}
 .rem-t{font-weight:500;margin:6px 0 2px}
 .rem-s{font-size:13px;color:var(--text-3);margin-bottom:10px}
 .rem-b{display:flex;gap:6px}
-.imp-sum{font-size:13px;color:var(--t2);margin:0 8px 8px}
+.imp-sum{font-size:13px;color:var(--text-2);margin:0 8px 8px}
 .imp-list{max-height:240px;overflow:auto;margin:0 8px}
 .imp-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)}
 .imp-row .n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.imp-row .t{color:var(--t3);white-space:nowrap}
-.imp-notes{font-size:12px;color:var(--t3);margin:10px 8px 0;padding-left:16px}
+.imp-row .t{color:var(--text-3);white-space:nowrap}
+.imp-notes{font-size:12px;color:var(--text-3);margin:10px 8px 0;padding-left:16px}
 .imp-notes li{margin:2px 0}
 .yd-list{display:flex;flex-direction:column;margin:6px 0 12px;max-height:50vh;overflow:auto}
 .yd-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line-c)}
@@ -371,10 +377,13 @@ svg{display:block}
 .ev.tchip.done .tt{text-decoration:line-through}
 .ev.tchip .tt{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .ev.tchip.ghost{background:transparent;box-shadow:inset 0 0 0 1px var(--line-c)}
-.fld .hint{font-size:12px;color:var(--t3)}
+.fld .hint{font-size:12px;color:var(--text-3)}
 @media (max-width:760px){
   .cal-seg span{display:none}
   .cal-seg button{padding:3px 9px}
+  /* M/W/D: drawn size stays; hit area 44px tall, only 1px sideways (buttons sit 2px apart). */
+  .cal-seg button{position:relative}
+  .cal-seg button::after{content:"";position:absolute;inset:-10px -1px}
   .tg{--gut:44px}
   .tg-hours div{white-space:nowrap;font-size:10.5px;padding-right:6px}
   .tg-gut{font-size:10.5px;padding-right:4px;white-space:nowrap}
@@ -431,7 +440,8 @@ svg{display:block}
 .ses .mono{font-size:calc(var(--text-size) * var(--mono-scale));color:var(--text-2)}
 .ses.early{opacity:.8}
 .f-none{font-size:14px;color:var(--text-3)}
-.f-sum{font-size:calc(var(--text-size) * var(--mono-scale));color:var(--text-2)}
+.f-sum{color:var(--text-2)}
+.f-sum .mono{font-size:calc(var(--text-size) * var(--mono-scale))}
 .pop .opts{display:grid;gap:2px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 18px}
 .stat{background:var(--surface);border:1px solid var(--line-c);border-radius:var(--radius-lg);padding:10px 12px}
@@ -525,13 +535,13 @@ button.hm-c{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none
 .search-box input{flex:1;border:0;outline:0;background:none}
 .search-box svg{width:16px;height:16px;color:var(--text-3)}
 .search-res{display:grid;gap:6px}
-mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
+mark{background:color-mix(in oklab,var(--prio-med) 30%,transparent);color:inherit;border-radius:2px}
 
 /* ===== auth ===== */
 .auth{position:fixed;inset:0;z-index:300;background:var(--ground);display:grid;place-items:center;padding:16px;overflow:auto}
 .auth-card{width:380px;max-width:100%;padding:8px 6px 22px}
 .brand{display:grid;justify-items:center;gap:14px;margin-bottom:12px}
-.brand .mark{width:72px;height:72px;border-radius:22.5%;display:block}
+.brand .art svg{width:120px;height:96px;max-width:100%;display:block}
 .brand .wm{height:40px;width:auto;display:block}
 .auth-sub{color:var(--text-2);font-size:14px;text-align:center;margin-bottom:22px}
 .auth .tabs{display:flex;gap:2px;border:1px solid var(--line-c);border-radius:var(--radius-sm);padding:2px;margin-bottom:14px}
@@ -545,7 +555,7 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
 .auth .fine{font-size:12px;color:var(--text-3);margin-top:12px;line-height:1.5}
 
 ::-webkit-scrollbar{width:8px;height:8px}
-::-webkit-scrollbar-thumb{background:rgba(var(--grey),.12);border-radius:4px}
+::-webkit-scrollbar-thumb{background:color-mix(in oklab,var(--text) 12%,transparent);border-radius:4px}
 ::-webkit-scrollbar-track{background:transparent}
 
 /* ===== responsive ===== */
@@ -562,32 +572,117 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
   #acct-btn{margin:0}
   .tip{display:none}
   .app{padding-bottom:calc(52px + var(--safe-b));height:100vh;height:100dvh}
-  .side{position:fixed;left:0;top:0;bottom:calc(52px + var(--safe-b));z-index:80;transform:translateX(-100%);transition:transform .2s;box-shadow:var(--shadow)}
-  .side.open{transform:none}
-  .scrim.on{display:block;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:75}
+  .side{position:fixed;left:0;top:0;bottom:calc(52px + var(--safe-b));z-index:80;transform:translateX(-100%);transition:transform var(--dur-1) var(--ease-exit);box-shadow:var(--shadow)}
+  .side.open{transform:none;transition:transform var(--dur-2) var(--ease-out)}
+  @media (prefers-reduced-motion:reduce){.side,.side.open{transform:none;transition:opacity var(--dur-2) var(--ease-out)}.side{opacity:0;pointer-events:none;transition-duration:var(--dur-1);transition-timing-function:var(--ease-exit)}.side.open{opacity:1;pointer-events:auto}}
+  .scrim.on{display:block;position:fixed;inset:0;background:var(--scrim);z-index:75}
   .menu-toggle{display:grid}
   .topbar{padding:0 10px 0 12px}
-  .content{padding:0 16px 40px}
+  .content{padding:0 16px 40px;scrollbar-width:none}
   .detail{width:100%;bottom:calc(52px + var(--safe-b))}
   .focus{flex-direction:column;gap:20px}
   .focus-r{width:auto;border:0;padding:0}
-  .matrix{grid-template-columns:1fr;grid-template-rows:none;height:auto}
+  /* Grid tracks default to min-content, so a nowrap title stretched rows and quads past .content; minmax(0,1fr) keeps them inside it. */
+  .matrix{grid-template-columns:minmax(0,1fr);grid-template-rows:none;height:auto}
   .quad{min-height:200px}
+  .quad .list,.rows{grid-template-columns:minmax(0,1fr)}
+  /* Phone tap targets: 44px (decision 3). */
+  .side .nav-item,.qa,.quad .qa,.search-box,.pop .mi{height:44px}
+  /* Tab bar: drawn 38px box stays; an invisible 44px hit area (rail is 52px tall, so 3px up and down). */
+  .rail-btn::after{content:"";position:absolute;inset:-3px}
+  /* Icon buttons: 30px to 44px box; 18px icon unchanged, no resting background so the look is the same. */
+  .icon-btn{width:44px;height:44px}
+  /* 24px drawn boxes stay (popover must not grow); an invisible 44px hit area instead. */
+  .rem-h .icon-btn,.kc-menu{position:relative}
+  .rem-h .icon-btn::after,.kc-menu::after{content:"";position:absolute;inset:-10px}
+  /* Kanban: the 44px menu button sat in a 30px header, and the cards below painted over its hit area (measured 64x38); the header grows to 44px so the whole box takes taps. Add task and Add column (31px and about 40px tall) get a real 44px min-height; the column's 6px card margin keeps them apart. */
+  .kcol .sec-h{height:44px}
+  .kc-add,.kc-new{min-height:44px}
+  /* Calendar: Today button (inline 30px height, 28px padding box inside its 1px border; insets count from the padding box) gets a 46px hit area; month day number (24px pill) gets as much as the clipped cell allows. */
+  #c-today{position:relative}
+  #c-today::after{content:"";position:absolute;inset:-9px 0}
+  /* Week header buttons are 40.6 to 42.7px wide at 360 to 375px (7 columns, no gap): a centred hit area at least 44px wide, same height, drawn layout unchanged. */
+  .tg-dh{position:relative}
+  .tg-dh::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:max(100%,44px);transform:translateX(-50%)}
+  .cell .d{position:relative}
+  .cell .d::after{content:"";position:absolute;inset:-4px -12px -4px -4px}
   .week{gap:4px}
   .habit{flex-wrap:wrap;row-gap:8px;padding:8px 8px 10px 14px}
   .habit .week{order:3;width:100%;justify-content:space-between}
   .wd button{width:34px;height:34px}
+  /* Habits: drawn 34px day cells and 42px title button stay; invisible 44px hit areas. Day cells are 47 to 48px apart at 375px and 45px at 360px (space-between), so 5px sideways never overlaps at either width. */
+  .wd button,.h-open{position:relative}
+  .wd button::after{content:"";position:absolute;inset:-5px}
+  .h-open::after{content:"";position:absolute;inset:-1px 0}
+  /* Focus: Start/Pause/Skip/End get a 44px hit area (drawn 40px stays; buttons are 10px apart); task input and pomo number inputs 44px tall. */
+  /* Insets count from the padding box: the secondary buttons have a 1px border, so 38 + 2 x 4 = 46 (primary 40 + 8 = 48); buttons are 10px apart, so 4px each side never overlaps. */
+  .f-btns .btn{position:relative}
+  .f-btns .btn::after{content:"";position:absolute;inset:-4px}
+  /* Pomo / Stopwatch toggle: drawn 26px tall buttons stay (55 and 88 wide, 2px apart); hit area 46 tall, no sideways growth so the two never overlap. The calendar switcher (.cal-seg) and the theme popover keep their own rules. */
+  .topbar .seg:not(.cal-seg) button{position:relative}
+  .topbar .seg:not(.cal-seg) button::after{content:"";position:absolute;inset:-10px 0}
+  /* Settings popover option rows: each label is a real 44px row; the 13px checkbox is unchanged. */
+  .pop .opt{min-height:44px}
+  .f-task input{padding:0;height:44px}
+  .pop .fld input:not([type=checkbox]){height:44px}
+  /* Fields the line above missed: due popover selects, tags prompt (also in .tok-row, a popover too), share dialog input and select. Font stays 16px. */
+  .pop .fld select,.pop .dlg-input,.invite input,.invite select{height:44px}
+  /* Share row is now 44px tall; centring keeps the drawn 32px Invite button, and its hit area, inside it. */
+  .invite{align-items:center}
+  /* Reminder, share and popover buttons: drawn 32px stays. Insets count from the padding box: .btn.sec has a 1px border so 30+7+7=44 (.btn.pri 32+14=46). Vertical only, so no sideways overlap; room in .rem-s (10px margin), .rem-b card (12px padding), .pop .btns (8px, 4px, plus 6px .pop padding). */
+  .rem-b .btn,.invite .btn,.pop .btns .btn{position:relative}
+  .rem-b .btn::after,.invite .btn::after,.pop .btns .btn::after{content:"";position:absolute;inset:-7px 0}
+  /* Due popover weekdays: "On" label sits alone, .days takes its own row (7 buttons cannot reach 44 wide beside a 52px label). Buttons grow to 44 tall and flex across the row; hidden attribute on #dp-days still works as display is untouched. ::after adds 2px each side (half the 4px gap) so hit areas touch, never overlap. The due popover (only it holds #dp-days) is widened to the viewport minus 8px each side; !important beats the inline width:320px from popover(). Measured at 375px: popover 359, button 43x44, hit 47x45; at 360px: popover 344, button 41x44, hit 44 to 45 x 45 (at the limit). The test pane's 8px scrollbar takes 8px from the row. */
+  .pop:has(#dp-days){width:calc(100vw - 16px)!important}
+  #dp-days{flex-wrap:wrap}
+  .pop .days{flex-basis:100%}
+  .pop .days button{flex:1;height:44px;position:relative}
+  .pop .days button::after{content:"";position:absolute;inset:0 -2px}
+  /* Matrix quick-add and Search inputs: the 44px box minus its 1px border left a 42px input; 1px negative margins make the input 44px tall, font stays 16px. */
+  .qa input,.search-box input{height:44px;margin:-1px 0}
+  /* Task checkbox: drawn 18px box stays; invisible hit area 45 tall by 45 wide. Insets count from the padding box (the 1.5px border sits outside it), so the base is 15px: 15+15+15=45 tall (inside the 46px row), 15+14+16=45 wide (14px left reaches the row edge, 16px right ends 14.5px past the box, 15.5px before the title). The priority dot is not a control. */
+  .row>.cb{position:relative}
+  .row>.cb::after{content:"";position:absolute;inset:-15px -16px -15px -14px}
+  /* Side panel heads: 32px head plus 6px top margin becomes a 44px head with no margin (label stays centred 22px down, only the list below moves 6px); the fold target (.caret) stretches to the full 44px; the 22px plus button keeps its drawn box and gets a 44px hit area (22px padding box, no border, 11px each side; stays inside the 44px head, 1px past the 10px right padding). */
+  .side-head{height:44px;margin-top:0}
+  .side-head .caret{align-self:stretch}
+  .side-head button{position:relative}
+  .side-head button::after{content:"";position:absolute;inset:-11px}
+  /* Detail checkbox: drawn 18px box stays. Insets count from the padding box (15px, 1.5px border outside it), which starts 8px below the top of .d-body (scroll clip), so the hit area runs from 0.5px to 45.5px: 15+9+21 = 45 tall; 15+17+13 = 45 wide (right edge 11.5px past the box, 0.5px before the title). The title row gets 6px extra bottom margin so the 45.5px hit area does not cover the Due row. */
+  .d-tt .cb{position:relative}
+  .d-tt .cb::after{content:"";position:absolute;inset:-9px -13px -21px -17px}
+  .d-tt{margin-bottom:6px}
+  /* Detail title (textarea, cannot take ::after): 4px top and 16px bottom padding with matching negative margins make a 24.7+20 = 44.7px box; the text stays in place, layout height unchanged. autosize() uses scrollHeight, which includes the padding. Top padding stops at the 4px of .d-body padding (overflow clips above it). */
+  .d-title{padding:4px 0 16px;margin:-4px 0 -16px}
+  /* Property rows: 32px to 44px real box. Rows are 2px apart, so a hit-area pseudo-element could not give each row 44 without overlapping its neighbours. The board draws 30px rows on desktop only. */
+  .prop{min-height:44px}
+  /* Subtask add: label and input 44px tall (was 30 and about 25); 16px font. */
+  .add-ck{min-height:44px}
+  .add-ck input{height:44px}
+  /* Subtask rows: real 44px rows and inputs (layout grows about 14px per subtask); the drawn 16px checkbox stays. Its hit area counts from the 13px padding box (1.5px border outside): 13+16+16 = 45 tall (0.5px past the 44px row, later siblings win), 13+19+13 = 45 wide (left stays inside the 22px pane padding, right reaches 1.5px into the input). */
+  .ck{min-height:44px}
+  .ck input{height:44px}
+  .ck .cb{position:relative}
+  .ck .cb::after{content:"";position:absolute;inset:-16px -13px -16px -19px}
   .hd-stats{grid-template-columns:1fr 1fr}
   .hd-run{grid-template-columns:1fr 70px}
   .hd-run .b{display:none}
   .row .meta .tag{display:none}
   .rem-stack{bottom:calc(64px + var(--safe-b));right:10px}
+  /* ticket 07: hide reminder cards while the detail pane is open so Tags and Delete stay reachable */
+  body:has(#detail:not(.hidden)) .rem-stack{display:none}
   .toast{bottom:calc(64px + var(--safe-b))}
+  /* Sign-in gutter: the auto grid track grew to the card's 380px width (the percentage max-width could not shrink it), so the card overflowed the 343px content box and inputs were 368px wide. A minmax(0,1fr) track keeps the card at 100% of .auth's content box (375 - 2 x 16 = 343); no card side padding, so the inputs sit on the 16px app gutter (343 wide at 375, 328 at 360). */
+  .auth{grid-template-columns:minmax(0,1fr)}
+  .auth-card{padding:8px 0 22px}
+  /* Sign in / Create account tabs: drawn 34px buttons stay (container 1px border + 2px padding = 40px). Hit area 44 tall: insets count from the button's padding box (no border, 34px), so 34 + 2 x 5 = 44; vertical only, the buttons are 2px apart. The container has no overflow clip. */
+  .auth .tabs button{position:relative}
+  .auth .tabs button::after{content:"";position:absolute;inset:-5px 0}
 }
 
 /* touch drag and drop */
 .row[draggable],.ev[draggable]{-webkit-touch-callout:none}
-.touch-ghost{opacity:.92;box-shadow:0 8px 24px rgba(0,0,0,.25);border-radius:8px;background:rgb(var(--bg))}
+.touch-ghost{opacity:.92;box-shadow:var(--shadow-pop);border-radius:8px;background:var(--ground)}
 
 /* ===== Martian Mono for real data only (T3, T12): times, dates, counts, durations ===== */
 :is(.mono,.quad h3 .cnt,.f-phase,.f-clock,.sec-h .n,.nav-item .cnt,.pop .mi .kbd,.cell .d,.tg-dh b,.tg-hours,.blk .bs,.stat .v,.wd button.part,.wd button.on,.habit .stk,.more){font-family:var(--font-mono);font-variant-numeric:tabular-nums}
@@ -606,7 +701,7 @@ mark{background:rgba(var(--p-med),.3);color:inherit;border-radius:2px}
 /* Google events: read-only, in their calendar's palette hue (set as --ec by calendar.ts); same look as tasks plus a faint hatch on blocks */
 .blk.gx{cursor:pointer;background-image:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in oklab,var(--ec) 10%,transparent) 6px 7px)}
 .blk.gx .bt{font-weight:400}
-.gx-info{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);margin:0 8px 6px}
+.gx-info{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);margin:0 8px 6px}
 .gx-info .dot{width:10px;height:10px;border-radius:3px}
 .pop .hint{font-size:12.5px;color:var(--text-2);margin:0 8px 8px;line-height:1.45}
 a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
@@ -624,3 +719,32 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-conten
 .tok-steps li{margin-bottom:4px}
 .tok-guide{margin:4px 8px;font-size:12.5px;color:var(--text-2)}
 .tok-guide summary{cursor:pointer;padding:4px 0}
+
+/* Dark mode: --text-3 is 4.16, 3.66 and 4.37 to 1 on --surface, --raised and --side-c, under the 4.5 text minimum.
+   Text on those three surfaces uses --text-2. Icons and borders keep --text-3 (3:1 is enough). --ground and --rail-c pass and are untouched. */
+:root[data-mode="dark"] .nav-item .cnt,
+:root[data-mode="dark"] .side-head,
+:root[data-mode="dark"] .row .meta,
+:root[data-mode="dark"] .row.done .title,
+:root[data-mode="dark"] .qa input::placeholder,
+:root[data-mode="dark"] .search-box input::placeholder,
+:root[data-mode="dark"] .f-task input::placeholder,
+:root[data-mode="dark"] .f-dur,
+:root[data-mode="dark"] .stat .k,
+:root[data-mode="dark"] .hd-stats .v small,
+:root[data-mode="dark"] .h-info .s,
+:root[data-mode="dark"] .wd:not(.today),
+:root[data-mode="dark"] .rem-s,
+:root[data-mode="dark"] .pop .mi .kbd,
+:root[data-mode="dark"] .pop .row-q button,
+:root[data-mode="dark"] .pop .fld .lab,
+:root[data-mode="dark"] .pop .note,
+:root[data-mode="dark"] .pop .hint,
+:root[data-mode="dark"] .pop .acct .e,
+:root[data-mode="dark"] .pop .member .who div:last-child,
+:root[data-mode="dark"] .pop .member .role,
+:root[data-mode="dark"] .pop .imp-row .t,
+:root[data-mode="dark"] .pop .imp-notes,
+:root[data-mode="dark"] .pop .yd-n small,
+:root[data-mode="dark"] .sec-h .n,
+:root[data-mode="dark"] .kc-add{color:var(--text-2)}

@@ -25,16 +25,18 @@
   /* semantic */
   --prio-high:#C9372C; --prio-med:#8A6100; --prio-low:#3B5FD9;
   --success:#2F7A3A; --info:#2D6AA6; --warning:#8A6100; --danger-c:#C9372C;
+  --danger-text:color-mix(in oklab,var(--danger-c) 75%,var(--text)); /* text-only danger: --danger-c is 4.13 to 1 on --raised in light; keep --danger-c for fills and icons */
   /* habit hues: oklch(var(--hab-l) var(--hab-c) <hue>), hues 25 55 85 120 150 185 215 250 290 + rose-grey */
   --hab-l:.52; --hab-c:.14; --hab-rose:oklch(.52 .05 15);
   --grain:.05;
   --shadow-pop:0 8px 24px rgba(43,47,51,.14),0 1px 3px rgba(43,47,51,.1);
+  --scrim:rgba(0,0,0,.25);
 
   /* type */
   --font-sans:"Onest Variable","Onest",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --font-mono:"Martian Mono Variable","Martian Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --mono-scale:.88;
-  --text-size:15px; --row:36px;
+  --text-size:15px; --row:38px;
 
   /* shape */
   --radius-lg:8px; --radius-sm:6px; --radius-pill:999px;
@@ -45,12 +47,11 @@
 
   /* ----- legacy aliases: style.css still reads these "r,g,b" triplets. Phase 7 moves each
      view onto the tokens above, then these go. ----- */
-  --primary:160,68,126; --on-primary:#FFFFFF;
-  --grey:35,39,26; --bg:238,242,234; --rail:225,231,219; --side:231,236,226; --hover:35,39,26; --pop:250,252,247;
+  --on-primary:#FFFFFF;
+  --rail:225,231,219; --side:231,236,226; --hover:35,39,26;
   --p-high:201,55,44; --p-med:138,97,0; --p-low:59,95,217;
   --danger:201,55,44; --toast-link:223,172,202;
   --line:var(--line-c);
-  --t1:var(--text); --t2:var(--text-2); --t3:var(--text-3); --t4:rgba(var(--grey),.24);
   --shadow:var(--shadow-pop);
   --radius:var(--radius-lg);
   --font:var(--font-sans); --font-head:var(--font-sans); --font-num:var(--font-mono);
@@ -68,11 +69,10 @@
   --grain:.07;
   --shadow-pop:0 8px 24px rgba(0,0,0,.45),0 1px 3px rgba(0,0,0,.35);
 
-  --primary:217,133,184; --on-primary:#1F0A18;
-  --grey:220,221,189; --bg:12,21,23; --rail:9,17,19; --side:15,27,29; --hover:220,221,189; --pop:26,43,45;
+  --on-primary:#1F0A18;
+  --rail:9,17,19; --side:15,27,29; --hover:220,221,189;
   --p-high:255,106,92; --p-med:242,193,78; --p-low:124,156,255;
   --danger:255,106,92; --toast-link:217,133,184;
-  --t4:rgba(var(--grey),.2);
   color-scheme:dark;
 }
-@media (max-width:760px){:root{--text-size:16px;--row:44px}}
+@media (max-width:760px){:root{--text-size:16px;--row:46px}}

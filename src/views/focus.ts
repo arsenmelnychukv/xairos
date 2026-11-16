@@ -90,7 +90,7 @@ export function renderFocus() {
       <div class="focus-r">
         <h4 class="f-h">Today</h4>
         <div class="sess">${today.slice().reverse().map(rec).join('') || '<div class="f-none">No sessions yet</div>'}</div>
-        <span class="mono f-sum">${fmtMins(mins)} focused today</span>
+        <span class="f-sum"><span class="mono">${fmtMins(mins)}</span> focused today</span>
         <div class="stats">
           <div class="stat"><div class="k">Today's Pomos</div><div class="v">${today.filter(f => f.mins >= s.focus * .8).length}</div></div>
           <div class="stat"><div class="k">Today's Focus</div><div class="v">${fmtMins(mins)}</div></div>
@@ -127,7 +127,7 @@ function pickTask(anchor: Element) {
   const draw = () => {
     const needle = q.value.trim().toLowerCase();
     const hits = open.filter(t => !needle || t.title.toLowerCase().includes(needle)).slice(0, 8);
-    list.innerHTML = hits.map(t => `<div class="mi" data-t="${t.id}">${esc(t.title || 'Untitled')}<span class="kbd">${t.due ? esc(fmtDue(t.due)) : ''}</span></div>`).join('') || '<div class="mi" style="color:var(--t3)">No open tasks</div>';
+    list.innerHTML = hits.map(t => `<div class="mi" data-t="${t.id}">${esc(t.title || 'Untitled')}<span class="kbd">${t.due ? esc(fmtDue(t.due)) : ''}</span></div>`).join('') || '<div class="mi" style="color:var(--text-3)">No open tasks</div>';
     list.querySelectorAll<HTMLElement>('[data-t]').forEach(el => el.onclick = () => { closePop(); focusOn(el.dataset.t!); renderFocus(); });
   };
   q.oninput = draw; draw(); q.focus();

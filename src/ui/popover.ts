@@ -31,7 +31,7 @@ export type MenuItem = [string, () => unknown, boolean?];
 
 /** A simple menu. Labels are escaped unless `rawHtml`. */
 export function menu(anchor: Element, items: MenuItem[], rawHtml = false) {
-  const tick = `<span class="kbd" style="color:rgb(var(--primary))">${I.check.replace('<svg', '<svg style="width:14px;height:14px"')}</span>`;
+  const tick = `<span class="kbd" style="color:var(--accent)">${I.check.replace('<svg', '<svg style="width:14px;height:14px"')}</span>`;
   const p = popover(anchor, items.map(([label, , on], i) => `<div class="mi" data-i="${i}">${rawHtml ? label : esc(label)}${on ? tick : ''}</div>`).join(''), 210);
   p.querySelectorAll<HTMLElement>('.mi').forEach(el => el.onclick = () => { const f = items[+el.dataset.i!]![1]; closePop(); f(); });
 }

@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "VITE_BACKEND=pocketbase vite --host 127.0.0.1 --port 5179",
     "dev:local": "vite --host 127.0.0.1 --port 5179",
+    "dev:user": "node scripts/dev-user.mjs --dev-machine",
     "pb": "node scripts/with-env.mjs server/.env -- bin/pocketbase serve --dir server/pb_data --hooksDir server/pb_hooks --migrationsDir server/pb_migrations --http 127.0.0.1:8090",
     "pb:get": "scripts/get-pocketbase.sh",
     "vapid": "node scripts/vapid.mjs server/.env",

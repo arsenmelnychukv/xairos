@@ -3,13 +3,13 @@ import { $, esc, lsDel, lsGet, uid } from '../lib/util';
 import { TODAY, addDays, parseYmd, todayD, ymd } from '../lib/dates';
 import { firstOccurrence } from '../recurrence';
 import { COLORS, SESSION_KEY, backend, clearDb, closeLocal, loadLocal, me, newTask, saveSession, server, session, setSession, ui, upd } from '../store';
+import { demoUser } from '../server/local';
 import { doSync, subscribeSync } from '../sync/engine';
-import { I } from '../ui/icons';
+import { I, emptyArt } from '../ui/icons';
 import { readHash, render } from '../app';
 import { disablePush } from '../push';
 import { closePop, popover } from '../ui/popover';
 import { toast } from '../ui/toast';
-import markUrl from '../../assets/icon.svg';
 import wmDark from '../../assets/wordmark.svg';
 import wmLight from '../../assets/wordmark-light.svg';
 
@@ -17,7 +17,7 @@ export function renderAuth(mode: 'signin' | 'signup' = 'signin', err = '') {
   $('#app').hidden = true;
   const a = $('#auth'); a.hidden = false;
   a.innerHTML = `<form class="auth-card" id="auth-form" novalidate>
-    <div class="brand"><img class="mark" src="${markUrl}" alt="" width="72" height="72"><img class="wm wm-dark" src="${wmDark}" alt="xairos" height="40"><img class="wm wm-light" src="${wmLight}" alt="xairos" height="40"></div>
+    <div class="brand"><div class="art" aria-hidden="true">${emptyArt}</div><img class="wm wm-dark" src="${wmDark}" alt="xairos" height="40"><img class="wm wm-light" src="${wmLight}" alt="xairos" height="40"></div>
     <div class="auth-sub">Plan your day. Keep every device in step.</div>
     <div class="tabs"><button type="button" data-m="signin" class="${mode === 'signin' ? 'on' : ''}">Sign in</button><button type="button" data-m="signup" class="${mode === 'signup' ? 'on' : ''}">Create account</button></div>
     ${mode === 'signup' ? `<label for="a-name">Name</label><input id="a-name" autocomplete="name" required>` : ''}
@@ -25,7 +25,7 @@ export function renderAuth(mode: 'signin' | 'signup' = 'signin', err = '') {
     <label for="a-pw">Password</label><input id="a-pw" type="password" autocomplete="${mode === 'signup' ? 'new-password' : 'current-password'}" minlength="8" required>
     <div class="err" id="a-err">${esc(err)}</div>
     <button class="btn pri" id="a-go">${mode === 'signup' ? 'Create account' : 'Sign in'}</button>
-    ${backend === 'local' ? '<div class="fine">Demo mode: accounts and sync run on a mock server stored in this browser. Open a second tab to see live sync; create a second account to try sharing.</div>' : ''}
+    ${backend === 'local' ? `<div class="fine">Demo mode: accounts and sync run on a mock server stored in this browser. Open a second tab to see live sync; create a second account to try sharing.${demoUser() ? ` Sign in with ${esc(demoUser()!.email)} / ${esc(demoUser()!.password)}.` : ''}</div>` : ''}
   </form>`;
   a.querySelectorAll<HTMLElement>('[data-m]').forEach(b => b.onclick = () => renderAuth(b.dataset.m as 'signin' | 'signup'));
   $<HTMLFormElement>('#auth-form').onsubmit = async e => {
